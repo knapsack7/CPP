@@ -3,15 +3,15 @@
 vector<int> computePrefix(string pat){
     int m = pat.size();
     vector<int> longestPrefix(m);
-    for(int i = 1, k = 0; i < m; i++){
-        while(k > 0 && pat[k] != pat[i]){
-            k = longestPrefix[k - 1];
+    for(int i = 1, j = 0; i < m; i++){
+        while(j > 0 && pat[j] != pat[i]){
+            j = longestPrefix[j - 1];
         }
-        if(pat[i] == pat[k]){
-            longestPrefix[i] = ++k;
+        if(pat[i] == pat[j]){
+            longestPrefix[i] = ++j;
         }
         else{
-            longestPrefix[i] = k;
+            longestPrefix[i] = j;
         }
     }
     return longestPrefix;
