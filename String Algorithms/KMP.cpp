@@ -1,3 +1,5 @@
+//every point in longestPrefix vector will tell us what is the longest suffix length which is also
+//the same as prefix
 vector<int> computePrefix(string pat){
     int m = pat.size();
     vector<int> longestPrefix(m);
