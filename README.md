@@ -27,5 +27,5 @@ Each section includes a README file explaining the specific data structure or al
 
 ## Compile and run
 
-g++ <filename>.cpp -o <outputfile>
-./<outputfile>
+g++ <filename>.cpp -o abc
+/.abc
