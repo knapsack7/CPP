@@ -5,7 +5,18 @@ Welcome to my **Data Structures and Algorithms** repository! This project showca
 ---
 
 ## Table of Contents
-- 
+- Arrays
+- Bit Manipulation
+- Dynamic Programming
+- Graph Algorithms
+- Heaps - Priority Queue
+- Linked Lists
+- Number Theory Algorithms
+- Recursion
+- Segment Tree
+- Stacks - Queue
+- String Algorithms
+- Union Finsd
 
 ---
 
