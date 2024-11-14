@@ -33,3 +33,48 @@ Summary
 	•	merge: O(\alpha(n)) (amortized)
 	•	connected: O(\alpha(n)) (amortized)
 	•	Space Complexity: O(n)
+
+
+LOGIC OF RANKS:
+
+In a Disjoint Set Union (DSU), also known as Union-Find, rank is a concept used to keep track of the “depth” or “height” of each tree in the forest of disjoint sets. This concept is essential in optimizing the union operation, which helps maintain a more balanced tree structure and improves the efficiency of subsequent operations.
+
+Purpose of Ranks
+
+The rank represents an estimate of the height of the tree rooted at a particular node. By using rank, we can ensure that when we perform a union of two sets, we attach the shorter tree under the root of the taller tree, keeping the overall tree as flat as possible. This practice, known as union by rank, helps minimize the height of the tree and improves the time complexity of find operations by preventing the trees from becoming too deep.
+
+How Union by Rank Works
+
+	1.	Initialize Ranks: At the beginning, each element is in its own set, so each element is its own root, and its rank is initialized to 0 (since it is the only node in its “tree”).
+	2.	Union Operation with Rank:
+	•	When performing a union of two sets, we find the roots of both sets.
+	•	Compare the ranks of the two roots:
+	•	If the ranks are different: Attach the tree with the smaller rank to the root with the larger rank. This ensures that the height of the resulting tree does not increase unnecessarily.
+	•	If the ranks are the same: Attach one tree to the other and increase the rank of the resulting root by 1. This rank increase represents that the height of this combined tree has effectively increased.
+	3.	Path Compression: In conjunction with union by rank, DSU often uses path compression during the find operation. Path compression flattens the tree structure by directly attaching each node along the search path to the root, reducing the height of the trees further. While path compression alone optimizes find, rank helps keep the trees balanced from the start.
+
+Example
+
+Let’s consider an example where we have elements {1, 2, 3, 4, 5}:
+	•	Initially, each element is its own set:
+	•	Roots: [1, 2, 3, 4, 5]
+	•	Ranks: [0, 0, 0, 0, 0]
+	•	Now, perform union(1, 2):
+	•	Since both elements have the same rank, make 1 the root of 2 and increase the rank of 1 by 1.
+	•	Roots: [1, 1, 3, 4, 5]
+	•	Ranks: [1, 0, 0, 0, 0]
+	•	Perform union(3, 4):
+	•	Similarly, make 3 the root of 4 and increase the rank of 3 by 1.
+	•	Roots: [1, 1, 3, 3, 5]
+	•	Ranks: [1, 0, 1, 0, 0]
+	•	Perform union(1, 3):
+	•	The roots of 1 and 3 have the same rank. Attach one root to the other and increase the rank of the new root.
+	•	Make 1 the root of 3, and increase the rank of 1 by 1.
+	•	Roots: [1, 1, 1, 3, 5]
+	•	Ranks: [2, 0, 1, 0, 0]
+
+Benefits of Using Rank in DSU
+
+Using ranks helps keep the tree structure balanced, ensuring the amortized time complexity of each operation remains low. Combined with path compression, union by rank allows DSU to perform find and union operations in nearly constant time, O(\alpha(n)), where \alpha is the inverse Ackermann function, which grows extremely slowly.
+
+In summary, rank in DSU serves as a balancing technique to keep the trees shallow, which optimizes both find and union operations for faster performance.
