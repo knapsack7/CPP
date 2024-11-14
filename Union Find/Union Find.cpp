@@ -7,14 +7,16 @@ public:
     UnionFind(){
     }
     UnionFind(int size){
-        parent = new int[size]; ranks = new int[size];
+        parent = new int[size]; 
+        ranks = new int[size];
         for(int element = 0 ; element < size ; element++){
             parent[element] = element , ranks[element] = 0 ;
         }
         _size = size;
     }
     void resize(int size){
-        parent = new int[size]; ranks = new int[size];
+        parent = new int[size]; 
+        ranks = new int[size];
         for(int element = 0 ; element < size ; element++){
             parent[element] = element , ranks[element] = 0 ;
         }
