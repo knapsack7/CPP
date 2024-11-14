@@ -9,3 +9,27 @@ Features
 	•	Union by Rank: Merges two sets by attaching the smaller tree under the root of the larger tree to keep the structure balanced.
 	•	Path Compression: Flattens the structure to reduce the tree height, making future queries faster.
 	•	Efficient Operations: Both find and union operations have an almost constant time complexity, O(\alpha(n)), where \alpha is the inverse Ackermann function, making them extremely efficient.
+
+Time Complexity
+
+	1.	find operation: This function determines the root of an element while performing path compression, which flattens the structure of the tree. In each call, nodes along the path are directly linked to the root, reducing future query times. Using path compression, the amortized time complexity for find is O(\alpha(n)), where \alpha is the inverse Ackermann function, which grows extremely slowly (almost constant time for practical values of n).
+	2.	merge operation: This function merges two sets by root using union by rank, which attaches the smaller tree to the root of the larger tree. Union by rank helps keep the trees balanced, so they don’t grow too deep. When combined with path compression, the amortized time complexity of the merge operation is also O(\alpha(n)).
+	3.	connected operation: This simply calls find on both elements and checks if they belong to the same root. The amortized time complexity for connected is therefore also O(\alpha(n)).
+
+Overall, each operation—find, merge, and connected—has an amortized time complexity of O(\alpha(n)).
+
+Space Complexity
+
+	1.	parent array: This array stores the parent of each element, with one integer per element. The space complexity for this array is O(n).
+	2.	ranks array: This array keeps track of the rank (or height) of each element’s root tree, which also requires O(n) space.
+	3.	Additional variables: The _size integer variable requires O(1) space.
+
+So, the overall space complexity of this Union-Find implementation is O(n).
+
+Summary
+
+	•	Time Complexity:
+	•	find: O(\alpha(n)) (amortized)
+	•	merge: O(\alpha(n)) (amortized)
+	•	connected: O(\alpha(n)) (amortized)
+	•	Space Complexity: O(n)
