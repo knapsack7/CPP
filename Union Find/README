@@ -1,0 +1,11 @@
+Union-Find (Disjoint Set) Data Structure
+
+Overview
+
+The Union-Find, or Disjoint Set, data structure is a powerful tool that keeps track of elements partitioned into multiple sets. It supports efficient operations to determine if two elements are in the same subset and to unify two subsets into one. Union-Find is widely used in algorithms for connected component detection, Kruskal’s Minimum Spanning Tree, and finding cycles in undirected graphs.
+
+Features
+
+	•	Union by Rank: Merges two sets by attaching the smaller tree under the root of the larger tree to keep the structure balanced.
+	•	Path Compression: Flattens the structure to reduce the tree height, making future queries faster.
+	•	Efficient Operations: Both find and union operations have an almost constant time complexity, O(\alpha(n)), where \alpha is the inverse Ackermann function, making them extremely efficient.
