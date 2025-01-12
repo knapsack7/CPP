@@ -1,0 +1,9 @@
+@startuml
+actor Client
+actor Server
+
+Client -> Server: FIN
+Server -> Client: ACK
+Server -> Client: FIN
+Client -> Server: ACK
+@enduml

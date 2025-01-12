@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libbraced-init-list.a "CMakeFiles/braced-init-list.dir/braced-init-list.cpp.o"
+/Library/Developer/CommandLineTools/usr/bin/ranlib libbraced-init-list.a

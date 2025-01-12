@@ -1,0 +1,9 @@
+@startuml
+actor Client
+actor Server
+
+Client -> Server: Data Segment 1
+Server -> Client: ACK 1
+Server -> Client: Data Segment 2
+Client -> Server: ACK 2
+@enduml

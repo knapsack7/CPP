@@ -1,0 +1,15 @@
+@startuml state diagram for tcp
+state "CLOSED" as closed
+state "LISTEN" as listen
+state "SYN_SENT" as syn_sent
+state "ESTABLISHED" as established
+state "FIN_WAIT_1" as fin_wait_1
+state "CLOSE_WAIT" as close_wait
+
+closed --> listen : Passive Open
+listen --> syn_sent : Send SYN
+syn_sent --> established : SYN-ACK Received
+established --> fin_wait_1 : Close
+fin_wait_1 --> close_wait : FIN+ACK Received
+close_wait --> closed : ACK Sent
+@enduml

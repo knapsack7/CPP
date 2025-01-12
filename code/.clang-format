@@ -1,0 +1,9 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Never
+BreakBeforeBraces: Allman
+QualifierAlignment: Left
+IncludeBlocks: Preserve
+NamespaceIndentation: All
