@@ -24,4 +24,6 @@ This project demonstrates a simple e-commerce shopping cart system implemented i
 
 ## How to Run
 1. Compile the project using a C++ compiler (e.g., g++).
+make
 2. Run the resulting executable.
+./Shopping Cart
