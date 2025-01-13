@@ -1,0 +1,24 @@
+Explanation of the Code
+	1.	Producer Thread:
+	•	Pushes data into the queue.
+	•	Calls dataCond.notify_one() to wake up a waiting thread (consumer).
+	2.	Consumer Thread:
+	•	Calls dataCond.wait() to wait for data to be available in the queue or for the finished flag.
+	•	Once notified, processes the data.
+	3.	Condition Variable Usage:
+	•	Ensures the consumer thread sleeps efficiently instead of constantly polling the queue.
+	•	Signals the consumer thread when the condition (queue not empty) is satisfied.
+
+
+Advantages of Condition Variables
+	1.	Efficient Thread Management:
+	•	Avoids busy waiting by putting threads to sleep until they are notified.
+	2.	Synchronization:
+	•	Helps coordinate multiple threads working on shared data.
+	3.	Clearer Code:
+	•	Makes thread interaction logic explicit and easy to understand.
+
+Key Points
+	•	A condition variable must always be used with a mutex to ensure thread safety.
+	•	The wait() method releases the mutex while waiting and reacquires it upon being notified.
+	•	The notify_one() or notify_all() methods wake up one or all waiting threads, respectively.

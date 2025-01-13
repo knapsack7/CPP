@@ -1,0 +1,2 @@
+# Empty compiler generated dependencies file for whos-up-first.
+# This may be replaced when dependencies are built.
