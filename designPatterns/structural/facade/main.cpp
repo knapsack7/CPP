@@ -43,9 +43,7 @@ private:
     std::shared_ptr<SecuritySystem> securitySystem;
 
 public:
-    HomeAutomationFacade()
-        : light(std::make_shared<Light>()),
-          musicSystem(std::make_shared<MusicSystem>()),
+    HomeAutomationFacade() : light(std::make_shared<Light>()), musicSystem(std::make_shared<MusicSystem>()),
           securitySystem(std::make_shared<SecuritySystem>()) {}
 
     void startDay() const {
