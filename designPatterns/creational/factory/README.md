@@ -2,6 +2,9 @@
 
 The Factory Pattern is a **creational design pattern** that provides an interface for creating objects in a superclass, but allows subclasses to alter the type of objects that will be created.
 
+In other words, The Factory Method pattern provides a generalized way to create instances of an object
+and can be a great way to hide implementation details for derived class.
+
 In this example, we will demonstrate a real-world scenario: a **Shape Factory** that generates objects of different shape types (`Circle`, `Rectangle`, `Triangle`) without exposing the instantiation logic to the client.
 
 ## **Key Points and Intricacies**
