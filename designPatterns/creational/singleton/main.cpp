@@ -23,12 +23,11 @@ private:
 
 public:
 	//static method to get the singleton instance
-	static Logger* getInstance() {
+	static Logger& getInstance() {
 		std::lock_guard<std::mutex> lock(mutex);
-		if(!instance){
-			return new Logger();
-		}
-		return instance;
+		if(!instance)
+			instance = new Logger();
+		return *instance;
 	}
 	//Method to log messages
 	void log(const std::string& msg){
@@ -48,13 +47,13 @@ public:
 
 // Example usage
 int main() {
-    Logger* logger = Logger::getInstance();
-    logger->log("This is the first log message.");
-    logger->log("Singleton pattern ensures a single instance of the logger.");
+    Logger& logger = Logger::getInstance();
+    logger.log("This is the first log message.");
+    logger.log("Singleton pattern ensures a single instance of the logger.");
 
     // Trying to get another instance (will return the same instance)
-    Logger* anotherLogger = Logger::getInstance();
-    anotherLogger->log("Another log message from the same instance.");
+    Logger& anotherLogger = Logger::getInstance();
+    anotherLogger.log("Another log message from the same instance.");
 
     std::cout << "Check the log.txt file for the logged messages." << std::endl;
     return 0;
