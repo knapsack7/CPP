@@ -31,34 +31,55 @@ public:
     }
 };
 
+enum class ObjectType {CIRCLE, RECTANGLE, TRIANGLE};
 
 //Shape Factory Class
 class ShapeFactory{
 public:
-    static std::shared_ptr<Shape> createShape(const std::string& shapeType){
-        if (shapeType == "Circle"){
+    static std::shared_ptr<Shape> createShape(const ObjectType shapeType){
+        if (shapeType == ObjectType::CIRCLE){
+            circles++;
             return std::make_shared<Circle>();
-        } else if (shapeType == "Rectangle"){
+        } else if (shapeType == ObjectType::RECTANGLE){
+            rectangles++;
             return std::make_shared<Rectangle>();
-        } else if (shapeType == "Triangle"){
+        } else if (shapeType == ObjectType::TRIANGLE){
+            triangles++;
             return std::make_shared<Triangle>();
         } else {
             throw std::invalid_argument("Unknown Shape Type");
         }
-    }    
+    }
+
+    static void printCounts(){
+        std::cout<<"Circles : " << circles <<std::endl;
+        std::cout<<"Rectaangles : " << rectangles <<std::endl; 
+        std::cout<<"Triangles: " << triangles <<std::endl; 
+    }
+private:
+    ShapeFactory(const ShapeFactory&) = delete;
+    ShapeFactory& operator=(const ShapeFactory&) = delete;
+    static int circles, rectangles, triangles;
 };
+
+int ShapeFactory::circles = 0;
+int ShapeFactory::rectangles = 0;
+int ShapeFactory::triangles = 0;
 
 int main(){
     try{
-        std::shared_ptr<Shape> shape1 = ShapeFactory::createShape("Circle");
+        std::shared_ptr<Shape> shape1 = ShapeFactory::createShape(ObjectType::CIRCLE);
         shape1->draw();
 
-        std::shared_ptr<Shape> shape2 = ShapeFactory::createShape("Rectangle");
+        std::shared_ptr<Shape> shape2 = ShapeFactory::createShape(ObjectType::RECTANGLE);
         shape2->draw();
 
-        std::shared_ptr<Shape> shape3 = ShapeFactory::createShape("Triangle");
+        std::shared_ptr<Shape> shape3 = ShapeFactory::createShape(ObjectType::TRIANGLE);
         shape3->draw();
     } catch(const std::exception& e){
         std::cerr << "Error: " << e.what() <<std::endl;
     }
+    std::cout<<"Total Objects info : "<<std::endl;
+    ShapeFactory::printCounts();
+    return 0;
 }
