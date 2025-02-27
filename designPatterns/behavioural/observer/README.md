@@ -1,46 +1,114 @@
-# Observer Pattern in C++
+# Observer Pattern - Amazon Order Status Updates
 
 ## Overview
-The Observer Pattern is a behavioral design pattern that defines a one-to-many dependency between objects. When the state of one object (the Subject) changes, all its dependent objects (Observers) are notified and updated automatically.
+This project demonstrates the **Observer Pattern** using a simplified Amazon order tracking system. When an order status changes, multiple stakeholders (**Customer, Seller, and Logistics**) are notified in real-time without being tightly coupled to the order system.
 
----
+## Design Pattern Used
+The **Observer Pattern** is used to:
+- Notify multiple observers (Customer, Seller, Logistics) when the order status changes.
+- Decouple the subject (Order) from the observers, allowing flexible extensions.
+- Ensure real-time updates without modifying existing code when new observers are added.
 
-## Key Components
+## System Components
+### 1. **Observer Interface (`OrderObserver`)**
+   - Defines the `update()` method that observers must implement.
 
-### 1. Subject
-- Maintains a list of observers and provides methods to add, remove, and notify observers.
+### 2. **Concrete Observers (`Customer`, `Seller`, `Logistics`)**
+   - Implement the `update()` method to receive order status notifications.
 
-### 2. Observer
-- An interface that defines the update method, which is called by the Subject when its state changes.
+### 3. **Subject (`Order`)**
+   - Maintains a list of observers and notifies them when the order status updates.
 
-### 3. Concrete Subject
-- A specific implementation of the Subject. It stores the state and notifies observers when the state changes.
+## UML Diagram
 
-### 4. Concrete Observer
-- Implements the Observer interface and updates itself based on the Subject's state.
+      +------------------+
+      |   OrderObserver  |<----------------+
+      +------------------+                 |
+              ▲                            |
+  +-----------------+     +-----------------+     +-----------------+
+  |    Customer     |     |    Seller       |     |   Logistics      |
+  +-----------------+     +-----------------+     +-----------------+
+              ▲                            ▲                     ▲
+              |                            |                     |
+      +---------------------------------------------------------+
+      |                        Order                           |
+      +---------------------------------------------------------+
+      | - observers: vector<OrderObserver*>                     |
+      | + addObserver(OrderObserver*)                           |
+      | + removeObserver(OrderObserver*)                        |
+      | + updateStatus(string)                                  |
+      +---------------------------------------------------------+
 
----
+## Code Implementation (C++)
 
-## Advantages
-1. **Loose Coupling**: Observers and Subjects are loosely coupled, improving flexibility and reusability.
-2. **Automatic Updates**: Observers are automatically notified of state changes.
-3. **Dynamic Relationships**: Observers can be added or removed at runtime.
+### **OrderObserver.h**
+```cpp
+class OrderObserver {
+public:
+    virtual void update(const std::string& status) = 0;
+    virtual ~OrderObserver() = default;
+};
 
----
+#include <iostream>
+#include "OrderObserver.h"
 
-## Disadvantages
-1. **Performance Overhead**: Notifying a large number of observers can be resource-intensive.
-2. **Order of Notification**: Observers are notified in an arbitrary order, which might lead to issues in some cases.
-3. **Memory Leaks**: Observers must be properly removed to avoid memory leaks, especially in languages without garbage collection.
+class Customer : public OrderObserver {
+public:
+    void update(const std::string& status) override {
+        std::cout << "Customer notified: Order is now " << status << std::endl;
+    }
+};
 
----
+class Seller : public OrderObserver {
+public:
+    void update(const std::string& status) override {
+        std::cout << "Seller notified: Order status changed to " << status << std::endl;
+    }
+};
 
-## Example Use Case
-Consider a stock market application where multiple clients (observers) need to be notified whenever a stock price (subject) changes.
+class Logistics : public OrderObserver {
+public:
+    void update(const std::string& status) override {
+        std::cout << "Logistics team notified: Order is now " << status << std::endl;
+    }
+};
 
----
+#include <vector>
+#include <algorithm>
+#include "OrderObserver.h"
 
-## How to Run
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
+class Order {
+private:
+    std::vector<OrderObserver*> observers;
+public:
+    void addObserver(OrderObserver* observer) { observers.push_back(observer); }
+    void removeObserver(OrderObserver* observer) {
+        observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end());
+    }
+    
+    void updateStatus(const std::string& status) {
+        std::cout << "Order Status Updated: " << status << std::endl;
+        for (OrderObserver* observer : observers) {
+            observer->update(status);
+        }
+    }
+};
+
+#include "Order.h"
+#include "OrderObserver.h"
+#include "ConcreteObservers.h"
+
+int main() {
+    Order order;
+    Customer customer;
+    Seller seller;
+    Logistics logistics;
+
+    order.addObserver(&customer);
+    order.addObserver(&seller);
+    order.addObserver(&logistics);
+
+    order.updateStatus("Shipped");  // Notifies all observers
+
+    return 0;
+}
