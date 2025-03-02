@@ -79,5 +79,17 @@ public:
      * @return The number of moves made
      */
     int getMoveCount() const;
+
+    /**
+     * Get the size of the board
+     * @return The size of the board
+     */
+    int getSize() const;
+
+    /**
+     * Get the cell value at i and j
+     * @return int value
+     */
+    int getCell(int, int) const;
 };
 

@@ -108,3 +108,15 @@ std::vector<std::pair<int, int>> Board::getAvailableMoves() const {
 int Board::getMoveCount() const {
     return moveCount;
 }
+
+int Board::getSize() const {
+    return BOARD_SIZE;
+}
+
+int Board::getCell(int i, int j) const{
+    if (i < 0 || i >= BOARD_SIZE || j < 0 || j>= BOARD_SIZE){
+        std::cout<<"Wrong idx\n";
+        return -1;
+    }
+    return grid[i][j]; 
+}

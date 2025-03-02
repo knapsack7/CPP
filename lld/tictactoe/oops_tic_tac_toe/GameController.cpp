@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include <memory>
-#include "game.cpp"
+#include <iostream>
+#include "TicTacToe.h"
 
 class GameController {
 private:
@@ -22,7 +23,7 @@ public:
     int startGame(int gameId){
         auto game = games.find(gameId);
         if (game != games.end()){
-            game.second.startGame();
+            game->second->startGame();
         } else {
             std::cout<<"Game Not Found\n";
         }

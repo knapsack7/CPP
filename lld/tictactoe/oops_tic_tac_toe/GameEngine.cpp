@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "Board.cpp"
+#include "Board.h"
 
 class GameEngine {
 public:
