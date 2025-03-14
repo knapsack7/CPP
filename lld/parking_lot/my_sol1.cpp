@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <mutex>
+#include <thread>
 using namespace std;
 
 class ParkingSpot {
@@ -24,6 +26,7 @@ private:
     vector<vector<unique_ptr<ParkingSpot>>> parking_spots;
     unordered_map<int, int> free_spots_count;
     int floor_id;
+    std::mutex floor_mutex;
 
 public:
     ParkingFloor(int floor, vector<vector<string>>& parking_floor) {
@@ -48,6 +51,7 @@ public:
     }
 
     int removeVehicle(int row, int col) {
+        std::lock_guard<std::mutex> lock(floor_mutex);
         if (!parking_spots[row][col] || !parking_spots[row][col]->isParked()) {
             return 404;
         }
@@ -58,6 +62,7 @@ public:
     }
 
     string park(int vehicle_type) {
+        std::lock_guard<std::mutex> lock(floor_mutex);
         if (free_spots_count[vehicle_type] == 0) return "";
         for (auto& row : parking_spots) {
             for (auto& spot : row) {
@@ -75,14 +80,17 @@ public:
 class SearchManager {
 private:
     unordered_map<string, string> cache;
+    std::mutex cache_mutex;
 
 public:
     string searchVehicle(string vehicle_number, string ticket_id) {
+        std::lock_guard<std::mutex> lock(cache_mutex);
         if (!vehicle_number.empty()) return cache[vehicle_number];
         if (!ticket_id.empty()) return cache[ticket_id];
         return "";
     }
     void index(string spot_id, string vehicle_number, string ticket_id) {
+        std::lock_guard<std::mutex> lock(cache_mutex);
         cache[vehicle_number] = spot_id;
         cache[ticket_id] = spot_id;
     }
@@ -139,7 +147,7 @@ public:
         }
     }
 
-    string park(int vehicle_type, string vehicle_number, string ticket_id, strategy& strat) {
+    string park(int vehicle_type, string vehicle_number, string ticket_id, strategy strat) {
         shared_ptr<ParkingFloor> floor_to_park = nullptr; 
         if (strat == strategy::MOSTVACANTSPOT){
             parking_strategy = make_shared<MostVacantSpot>();
@@ -177,6 +185,23 @@ public:
     }
 };
 
-// int main(){
-//     return 0;
-// }
+int main() {
+    // Initialize parking lot
+    std::vector<std::vector<std::vector<std::string>>> parking = {
+        {{"1-1", "2-1"}, {"1-1", "2-1"}},
+        {{"1-1", "2-1"}, {"1-1", "2-1"}}
+    };
+    Solution solution(parking);
+
+    // Create threads for parking and removing vehicles
+    std::thread t1(&Solution::park, &solution, 1, "ABC123", "TICKET1", strategy::NEARESTFLOORFIRST);
+    std::thread t2(&Solution::park, &solution, 2, "XYZ456", "TICKET2", strategy::MOSTVACANTSPOT);
+    std::thread t3(&Solution::park, &solution, 1, "ABC123", "TICKET1", strategy::NEARESTFLOORFIRST);
+
+    // Join threads
+    t1.join();
+    t2.join();
+    t3.join();
+
+    return 0;
+}
