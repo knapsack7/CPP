@@ -2,24 +2,24 @@
 #include <iostream>
 #include <stdexcept>
 
-TicTacToe::TicTacToe(int boardSize, GameMode mode) : board(boardSize), gameOver(false), winner(' ') {
+TicTacToe::TicTacToe(int boardSize, GameMode mode) : board(), gameOver(false), winner(' ') {
     PlayerFactory factory;
     
     // Initialize players based on game mode
     switch (mode) {
         case GameMode::HUMAN_VS_HUMAN:
-            player1 = factory.createHumanPlayer('X', board);
-            player2 = factory.createHumanPlayer('O', board);
+            player1 = factory.createHumanPlayer("Player X", 'X');
+            player2 = factory.createHumanPlayer("Player O", 'O');
             break;
             
         case GameMode::HUMAN_VS_AI:
-            player1 = factory.createHumanPlayer('X', board);
-            player2 = factory.createAIPlayer('O', board);
+            player1 = factory.createHumanPlayer("Player X", 'X');
+            player2 = factory.createAIPlayer("Computer", 'O');
             break;
             
         case GameMode::AI_VS_AI:
-            player1 = factory.createAIPlayer('X', board);
-            player2 = factory.createAIPlayer('O', board);
+            player1 = factory.createAIPlayer("Computer 1", 'X');
+            player2 = factory.createAIPlayer("Computer 2", 'O');
             break;
     }
     
@@ -28,17 +28,19 @@ TicTacToe::TicTacToe(int boardSize, GameMode mode) : board(boardSize), gameOver(
 
 void TicTacToe::startGame() {
     std::cout << "Game started!\n";
-    board.printBoard();
+    board.display();
     
     while (!gameOver) {
-        std::cout << "Player " << currentPlayer->getSymbol() << "'s turn\n";
+        std::cout << "Player " << currentPlayer->getMarker() << "'s turn\n";
         
         // Get move from current player
-        std::pair<int, int> move = currentPlayer->makeMove();
-        
         try {
-            makeMove(move.first, move.second);
-            board.printBoard();
+            bool moveMade = currentPlayer->makeMove(board);
+            if (!moveMade) {
+                std::cout << "Move failed. Try again.\n";
+                continue;
+            }
+            board.display();
         } catch (const std::exception& e) {
             std::cout << "Error: " << e.what() << std::endl;
             continue;
@@ -69,12 +71,13 @@ void TicTacToe::makeMove(int row, int col) {
         throw std::invalid_argument("Invalid move");
     }
     
-    board.makeMove(row, col, currentPlayer->getSymbol());
+    board.makeMove(row, col, currentPlayer->getMarker());
     
     // Check for win or draw
-    if (board.checkWin(currentPlayer->getSymbol())) {
+    char winner_marker = board.checkWinner();
+    if (winner_marker == currentPlayer->getMarker()) {
         gameOver = true;
-        winner = currentPlayer->getSymbol();
+        winner = currentPlayer->getMarker();
     } else if (board.isFull()) {
         gameOver = true;
     } else {

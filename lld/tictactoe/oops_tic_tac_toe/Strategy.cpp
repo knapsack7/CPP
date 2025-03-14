@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Board.cpp"
+#include "Board.h"
 // Forward declaration of Board class
 class Board;
 

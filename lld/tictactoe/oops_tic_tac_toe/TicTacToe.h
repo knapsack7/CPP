@@ -19,8 +19,8 @@ enum class GameMode {
 class TicTacToe {
 private:
     Board board;
-    std::unique_ptr<Player> player1;
-    std::unique_ptr<Player> player2;
+    std::shared_ptr<Player> player1;
+    std::shared_ptr<Player> player2;
     Player* currentPlayer;
     bool gameOver;
     char winner;
