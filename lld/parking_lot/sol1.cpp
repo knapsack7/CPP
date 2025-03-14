@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <memory>
 using namespace std;
 
 class ParkingSpot {
@@ -88,25 +89,78 @@ public:
     }
 };
 
+class ParkingStrategy{
+public:
+    virtual shared_ptr<ParkingFloor> strategy(vector<shared_ptr<ParkingFloor>>& floors, int vehicle_type) = 0;
+};
+
+enum class strategy {
+    NEARESTFLOORFIRST = 0,
+    MOSTVACANTSPOT
+};
+
+class NearestFloorFirst : public ParkingStrategy{
+public:
+    shared_ptr<ParkingFloor> strategy(vector<shared_ptr<ParkingFloor>>& floors, int vehicle_type) override {
+        for (auto& floor : floors) {
+            int free_spot_count = floor->getFreeSpotsCount(vehicle_type);
+            if (free_spot_count) {
+                return floor;
+            }
+        }
+        return nullptr;
+    }
+};
+
+class MostVacantSpot : public ParkingStrategy{
+public:
+    shared_ptr<ParkingFloor> strategy(vector<shared_ptr<ParkingFloor>>& floors, int vehicle_type) override {
+        shared_ptr<ParkingFloor> floor_with_max_free_spot = nullptr;
+        int max_free_spot_count = 0;
+        for (auto& floor : floors) {
+            int free_spot_count = floor->getFreeSpotsCount(vehicle_type);
+            if(free_spot_count > max_free_spot_count) {
+                floor_with_max_free_spot = floor;
+                max_free_spot_count = free_spot_count;
+            }
+        }
+        return floor_with_max_free_spot;
+    }
+};
+
 class Solution {
 private:
-    vector<unique_ptr<ParkingFloor>> floors;
+    vector<shared_ptr<ParkingFloor>> floors;
     SearchManager search_manager;
-
+    shared_ptr<ParkingStrategy> parking_strategy;
 public:
     Solution(vector<vector<vector<string>>>& parking) {
         for (int i = 0; i < parking.size(); ++i) {
-            floors.push_back(make_unique<ParkingFloor>(i, parking[i]));
+            floors.push_back(make_shared<ParkingFloor>(i, parking[i]));
         }
     }
 
-    string park(int vehicle_type, string vehicle_number, string ticket_id) {
-        for (auto& floor : floors) {
-            string result_spot_id = floor->park(vehicle_type);
-            if (!result_spot_id.empty()) {
-                search_manager.index(result_spot_id, vehicle_number, ticket_id);
-                return result_spot_id;
-            }
+    string park(int vehicle_type, string vehicle_number, string ticket_id, const strategy& strat) {
+        shared_ptr<ParkingFloor> floor_to_park = nullptr; 
+        if (strat == strategy::MOSTVACANTSPOT){
+            parking_strategy = make_shared<MostVacantSpot>();
+            
+        }
+        else {
+            parking_strategy = make_shared<NearestFloorFirst>();
+        }
+        if (parking_strategy == nullptr){
+            cout<<"Parking strategy can't be applied\n";
+            return "";
+        }
+        floor_to_park = parking_strategy->strategy(floors, vehicle_type);
+        if (floor_to_park == nullptr) {
+            return "";
+        }
+        string result_spot_id = floor_to_park->park(vehicle_type);
+        if (!result_spot_id.empty()) {
+            search_manager.index(result_spot_id, vehicle_number, ticket_id);
+            return result_spot_id;
         }
         return "";
     }
@@ -126,4 +180,3 @@ public:
         return floors[floor]->getFreeSpotsCount(vehicle_type);
     }
 };
-
