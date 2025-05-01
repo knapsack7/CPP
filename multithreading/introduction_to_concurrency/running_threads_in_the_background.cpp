@@ -3,6 +3,20 @@
 #include<chrono>
 #include<algorithm>
 
+/*
+ * In C++, your process = your main thread
+ * Detaching a thread doesn't keep the process alive
+ * You must explicitly keep the main thread running- either via an infinite loop, signal wait or join() 
+ */
+
+/*
+ *	Feature					C			C++
+ *	Threading				pthread_create		std::thread
+ *	Main Exists== process dies		Yes			Yes
+ *	Detached threads keep alive?		No			No
+ *	Need infinite loop or signal wait	Yes			Yes
+ */
+
 void Daemon(){
 	while(1){
 		std::cout << "I am Daemon thread, No one can kill me except process is terminated" << std::endl;
