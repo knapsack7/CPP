@@ -113,6 +113,17 @@ std::thread t2 = std::move(t1); // t1 is now non-joinable
 
 ---
 
+|--------------------| <- High address
+|     Stack          | <-- local variables
+|--------------------|
+|     Heap           | <-- dynamic memory (new, malloc)
+|--------------------|
+|   BSS / Data       | <-- globals/static vars
+|--------------------|
+|     Text (code)    |
+|--------------------| <- Low address
+
+
 ## 🔸 Best Practices
 
 - Use `std::move` only **once you're done using** the original object.
