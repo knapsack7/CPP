@@ -108,3 +108,19 @@ int main() {
 // after std::move(t), the original t in main() becomes non-joinable
 
 */
+
+/*
+
+// const in mutex world
+
+class Logger {
+public:
+	void log(const std::string& msg) const{
+		std::lock_guard<std::mutex> lock(mtx); // ok bz mtx is mutable
+		std::cout<< msg <<std::endl;
+	}
+private:
+	mutable std::mutex mtx;
+}
+
+*/
