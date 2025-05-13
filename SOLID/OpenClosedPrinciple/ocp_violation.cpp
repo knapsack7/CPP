@@ -15,6 +15,7 @@ However, every time a new customer type is introduced, we must modify the calcul
 */
 
 #include <iostream>
+#include <memory>
 using namespace std;
 
 // ❌ BAD: Adding a new customer type requires modifying this class
@@ -32,9 +33,9 @@ public:
 };
 
 int main() {
-    DiscountCalculator calculator;
-    cout << "Regular Customer Discount: " << calculator.calculateDiscount("Regular", 1000) << endl;
-    cout << "Premium Customer Discount: " << calculator.calculateDiscount("Premium", 1000) << endl;
+    std::unique_ptr<DiscountCalculator> calculator = std::make_unique<DiscountCalculator>();
+    cout << "Regular Customer Discount: " << calculator->calculateDiscount("Regular", 1000) << endl;
+    cout << "Premium Customer Discount: " << calculator->calculateDiscount("Premium", 1000) << endl;
 
     return 0;
 }

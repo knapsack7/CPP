@@ -1,7 +1,13 @@
 #include <iostream>
 
 /*
-Here, the PaymentProcessor class directly depends on PayPalPayment,
+
+The Dependency Inversion Principle states that:
+High-level modules should not depend on low-level modules. Both should depend on abstractions.
+Abstractions should not depend on details. Details should depend on abstractions.
+
+
+Here, the PaymentProcessor(high-level module) class directly depends on PayPalPayment(low-level module),
 which makes it tightly coupled and hard to extend.
 
 Problems with this approach:

@@ -12,7 +12,7 @@ using namespace std;
 class DiscountStrategy {
 public:
     virtual double getDiscount(double amount) = 0;  // Pure virtual function
-    virtual ~DiscountStrategy() {}
+    virtual ~DiscountStrategy() {} // Must be declared for polymorphic type Classes for no memory-leak problem
 };
 
 // ✅ Concrete strategy for regular customers
@@ -51,7 +51,7 @@ int main() {
     unique_ptr<DiscountStrategy> regular = make_unique<RegularDiscount>();
     unique_ptr<DiscountStrategy> premium = make_unique<PremiumDiscount>();
     unique_ptr<DiscountStrategy> vip = make_unique<VIPDiscount>();
-
+    // since calculateDiscount is static function we dont need to have DiscountCalculator class object to invoke it. 
     cout << "Regular Discount: " << DiscountCalculator::calculateDiscount(regular, 1000) << endl;
     cout << "Premium Discount: " << DiscountCalculator::calculateDiscount(premium, 1000) << endl;
     cout << "VIP Discount: " << DiscountCalculator::calculateDiscount(vip, 1000) << endl;

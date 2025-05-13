@@ -1,5 +1,30 @@
 #include <iostream>
 #include <vector>
+/*
+ * ✨ Bonus Tip – Rule of Three:
+If your class allocates resources (like dynamic memory):
+
+You should define:
+
+Copy Constructor
+
+Copy Assignment Operator
+
+Destructor
+
+Because shallow copies will otherwise lead to double delete, memory corruption, or shared state bugs✨ Bonus Tip – Rule of Three:
+If your class allocates resources (like dynamic memory):
+
+You should define:
+
+Copy Constructor
+
+Copy Assignment Operator
+
+Destructor
+
+Because shallow copies will otherwise lead to double delete, memory corruption, or shared state bugs
+ */
 
 class Log {
     int log_daemon_id;

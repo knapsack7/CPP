@@ -1,0 +1,2 @@
+Report Title: Sales Report
+Report Content: Sales increased by 20%

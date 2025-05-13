@@ -14,7 +14,7 @@ public:
     virtual void makeSound() {
         cout << "Bird is chirping." << endl;
     }
-    virtual ~Bird() {}  // Virtual destructor for proper cleanup
+    virtual ~Bird() {}  // Must Virtual destructor for proper cleanup
 };
 
 // ✅ Separate interface for flying birds
@@ -41,6 +41,7 @@ public:
 };
 
 // ✅ Function that works only for flying birds
+// see Bird base class is changed with the IFlyable Interface
 void makeBirdFly(IFlyable* bird) {
     bird->fly();  // ✅ Now only flyable birds can be passed
 }

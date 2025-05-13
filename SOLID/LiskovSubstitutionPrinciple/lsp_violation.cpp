@@ -44,6 +44,8 @@ public:
 };
 
 // Function expecting a Bird but breaking for Penguins
+// Here for the subtype Penguin Base class Bird is not substitutabel with it 
+// as Penguin dont fly and it will throw an error
 void makeBirdFly(Bird* bird) {
     bird->fly();  // ❌ Throws error for Penguin
 }

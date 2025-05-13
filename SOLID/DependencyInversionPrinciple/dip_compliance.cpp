@@ -1,64 +1,67 @@
 #include <iostream>
-using namespace std;
-
+#include <memory>
 
 /*
-We introduce an interface (abstract class) 
-IPayment so that PaymentProcessor depends on an abstraction, not a concrete class.
+✅ Correct Approach (DIP-Compliant Solution)
 
-🔥 Key Benefits of Using DIP
+We create an abstraction (interface) that both high-level and low-level modules depend on.
+This makes the system more flexible and maintainable.
 
-✅ Decoupling: PaymentProcessor does not depend on specific payment implementations.
-✅ Scalability: We can add GooglePayPayment, ApplePayPayment, etc., without modifying PaymentProcessor.
-✅ Flexibility: We can change dependencies at runtime using dependency injection.
-✅ Testability: We can mock IPayment for unit testing.
-
+Key improvements:
+1. Created IPayment interface as an abstraction
+2. PaymentProcessor depends on the interface, not concrete implementation
+3. Easy to add new payment methods without modifying existing code
+4. Follows Open/Closed Principle
 */
 
-// Step 1: Define an interface (Abstraction)
+// Abstract interface that both high and low level modules depend on
 class IPayment {
 public:
-    virtual void pay(int amount) = 0;  // Pure virtual function
-    virtual ~IPayment() {}  // Virtual destructor
+    virtual void pay(int amount) = 0;
+    virtual ~IPayment() = default;
 };
 
-// Step 2: Implement different payment methods
+// Low-level module implementing the interface
 class PayPalPayment : public IPayment {
 public:
     void pay(int amount) override {
-        cout << "Processing payment of $" << amount << " using PayPal." << endl;
+        std::cout << "Processing payment of $" << amount << " using PayPal." << std::endl;
     }
 };
 
+// Another low-level module implementing the same interface
 class StripePayment : public IPayment {
 public:
     void pay(int amount) override {
-        cout << "Processing payment of $" << amount << " using Stripe." << endl;
+        std::cout << "Processing payment of $" << amount << " using Stripe." << std::endl;
     }
 };
 
-// Step 3: High-level module depends on abstraction
+// High-level module depending on abstraction (interface)
 class PaymentProcessor {
 private:
-    IPayment* payment;  // Dependency injected via constructor
+    std::unique_ptr<IPayment> payment;
 public:
-    PaymentProcessor(IPayment* p) : payment(p) {}
-
+    // Constructor injection of the payment dependency
+    PaymentProcessor(std::unique_ptr<IPayment> payment) : payment(std::move(payment)) {}
+    
     void processPayment(int amount) {
         payment->pay(amount);
     }
 };
 
 int main() {
-    // PayPal Payment
-    PayPalPayment paypal;
-    PaymentProcessor processor1(&paypal);
-    processor1.processPayment(100);
+    // Using PayPal
+    auto paypalPayment = std::make_unique<PayPalPayment>();
+    PaymentProcessor paypalProcessor(std::move(paypalPayment));
+    paypalProcessor.processPayment(100);
 
-    // Stripe Payment
-    StripePayment stripe;
-    PaymentProcessor processor2(&stripe);
-    processor2.processPayment(200);
+    // Using Stripe
+    auto stripePayment = std::make_unique<StripePayment>();
+    // move used to transfer ownership of the object to the PaymentProcessor object
+    // To enforce the space optimization as it steal pointer not copy the data.
+    PaymentProcessor stripeProcessor(std::move(stripePayment));
+    stripeProcessor.processPayment(200);
 
     return 0;
 }

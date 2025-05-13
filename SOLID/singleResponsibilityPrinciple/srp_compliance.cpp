@@ -6,32 +6,43 @@ We split responsibilities into separate classes:
 	2.	ReportStorage → Handles file operations.
 */
 
-#include <iostream>
-#include <fstream>
-#include <memory>  // For smart pointers
+#include<iostream>
+#include<fstream>
+#include<memory>
 using namespace std;
 
-// ✅ Class responsible for only report content (Business Logic)
-class Report {
+
+// Class responsible for business logic
+class Report{
 private:
     string title;
     string content;
 public:
-    Report(string t, string c) : title(t), content(c) {}
+    Report(const string& title, const string& content) : title(title),
+    content(content){}
 
-    void generateReport() {
-        cout << "Generating Report: " << title << endl;
-        cout << "Content: " << content << endl;
+    void generateReport(){
+        cout<<"Generating Report"<<title<<endl;
+        cout<<"Content. :"<<content<<std::endl;
     }
 
-    string getTitle() { return title; }
-    string getContent() { return content; }
+    string getTitle() const {return title;}
+    string getContent() const {return content;}
+
+    ~Report(){}
+
 };
 
-// ✅ Separate class for handling file storage
-class ReportStorage {
+// Separate Class for Storage Management
+class IReportStorage {
 public:
-    static void saveToFile(const Report& report, string filename) {
+    virtual void save(const Report& report, string filename) = 0;
+    virtual ~IReportStorage() = default;
+};
+
+class FileReportStorage : public IReportStorage {
+public:
+    void save(const Report& report, string filename) override {
         ofstream file(filename);
         if (file.is_open()) {
             file << "Report Title: " << report.getTitle() << "\n";
@@ -48,10 +59,14 @@ int main() {
     unique_ptr<Report> report = make_unique<Report>("Sales Report", "Sales increased by 20%");
     report->generateReport();
 
-    ReportStorage::saveToFile(*report, "report.txt");  // ✅ Now storage logic is separate
+    unique_ptr<IReportStorage> storage = make_unique<FileReportStorage>();
+    storage->save(*report, "report.txt");
 
     return 0;
 }
+
+
+
 
 /*
 🔥 Advantages of This Approach
