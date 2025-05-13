@@ -1,0 +1,51 @@
+1. Thread Local Storage:
+
+thread_local int threadId = 0;  // Each thread gets its own copy
+
+2. Exception Safety
+
+void safeOperation() {
+    std::lock_guard<std::mutex> lock(mtx);
+    try {
+        // Operations that might throw
+    } catch (...) {
+        // Lock is automatically released
+    }
+}
+
+3. Performance Optimization
+
+// Cache line alignment
+struct alignas(64) CacheAligned {
+    std::atomic<int> value;  // Prevents false sharing
+};
+
+4. Debugging Optimization
+
+// Thread ID logging
+std::cout << "Thread " << std::this_thread::get_id() << " running\n";
+
+// Using thread sanitizer
+// Compile with: -fsanitize=thread
+
+5. Commom Patterns
+
+// Producer-Consumer
+class ProducerConsumer {
+    std::queue<int> queue;
+    std::mutex mtx;
+    std::condition_variable cv;
+
+    void producer() {
+        std::lock_guard<std::mutex> lock(mtx);
+        queue.push(42);
+        cv.notify_one();
+    }
+
+    void consumer() {
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [this] { return !queue.empty(); });
+        int value = queue.front();
+        queue.pop();
+    }
+};
