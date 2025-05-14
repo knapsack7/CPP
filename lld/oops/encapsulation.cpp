@@ -1,5 +1,7 @@
 /*
-Encapsulation is one of the four fundamental principles of Object-Oriented Programming (OOP). It is the practice of bundling data (variables) and methods that operate on that data into a single unit (class) while restricting direct access to the internal details.
+Encapsulation is one of the four fundamental principles of Object-Oriented Programming (OOP). 
+It is the practice of bundling data (variables) and methods that operate on that data into a single unit (class) 
+while restricting direct access to the internal details.
 
 Encapsulation in C++ is achieved using:
 
@@ -12,7 +14,8 @@ Encapsulation helps in data protection, modularity, and maintainability of the c
 
 What is meant by Encapsulation?
 
-Encapsulation means wrapping the data (variables) and code (methods) together into a single unit (class). It restricts direct access to some of an object's components, which helps protect data integrity and prevents unintended modifications.
+Encapsulation means wrapping the data (variables) and code (methods) together into a single unit (class). 
+It restricts direct access to some of an object's components, which helps protect data integrity and prevents unintended modifications.
 
 Key Benefits of Encapsulation
 Data Hiding: Prevents direct access to sensitive data.

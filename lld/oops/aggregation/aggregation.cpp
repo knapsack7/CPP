@@ -8,7 +8,7 @@ class Teachable {
 public:
     virtual void teach() = 0;
     virtual string getName() = 0;
-    virtual ~Teachable() = default;
+    virtual ~Teachable() = default; // must destructor
 };
 
 
