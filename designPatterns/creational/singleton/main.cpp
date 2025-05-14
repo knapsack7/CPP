@@ -17,9 +17,10 @@ private:
         }
     }
 
-	//Deleting copy constructor and assignment operator to prevent copying
-	Logger(const Logger&) = delete;
-	Logger& operator=(const Logger&) = delete;
+	//Deleting copy constructor, move constructor and assignment operator to prevent copying
+	Logger(const Logger&) = delete; // copy constructor
+	Logger& operator=(const Logger&) = delete; // assignment operator
+	Logger(const Logger&&) = delete; // Move Constructor
 
 public:
 	//static method to get the singleton instance
