@@ -24,6 +24,7 @@ struct Config {
 
 // Metrics structure
 struct Metrics {
+    // atomic is thread-safe when different threads are accessing the same object
     std::atomic<size_t> totalIncrements{0};
     std::atomic<size_t> totalQueries{0};
     std::atomic<size_t> errorCount{0};
@@ -31,8 +32,8 @@ struct Metrics {
     // Add copy constructor and assignment operator
     Metrics() = default;
     Metrics(const Metrics& other) {
-        totalIncrements = other.totalIncrements.load();
-        totalQueries = other.totalQueries.load();
+        totalIncrements = other.totalIncrements.load(); // load from atomic struct to avoid race condition
+        totalQueries = other.totalQueries.load(); // to safely read the value from atomic struct
         errorCount = other.errorCount.load();
     }
     Metrics& operator=(const Metrics& other) {
@@ -41,7 +42,7 @@ struct Metrics {
             totalQueries = other.totalQueries.load();
             errorCount = other.errorCount.load();
         }
-        return *this;
+        return *this; // since return type is reference, we need to return the object as value not address
     }
 };
 
@@ -63,8 +64,8 @@ public:
 // Main WebpageCounter class
 class WebpageCounter {
 private:
-    static constexpr size_t MAX_PAGES = 1000;
-    std::array<std::atomic<int>, MAX_PAGES> visitCounts;
+    static constexpr size_t MAX_PAGES = 1000; // modern c++ style to use constexpr to inline define MAX_PAGES static member
+    std::array<std::atomic<size_t>, MAX_PAGES> visitCounts;
     std::array<std::unique_ptr<std::mutex>, MAX_PAGES> mutexes;
     std::unique_ptr<ILogger> logger;  // Keep the unique_ptr
     int totalPages;
@@ -73,11 +74,12 @@ private:
 
 public:
     // Constructor instead of init method
+    // if no config is provided, it will use the default config
     WebpageCounter(int totalPages, std::unique_ptr<ILogger> logger, const Config& config = Config{})
         : totalPages(totalPages)
         , logger(std::move(logger))  // Move the logger
         , config(config)
-        , metrics()
+        , metrics()  // default initialize metrics
     {
         std::cout << "Starting constructor initialization..." << std::endl;
 
