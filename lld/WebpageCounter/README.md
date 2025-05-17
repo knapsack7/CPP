@@ -429,3 +429,63 @@ visitCounts[2].fetch_add(1);  // Atomic operation
 - Lock all required mutexes at once
 - Perform all increments while holding locks
 - Unlock all mutexes at once
+
+## Potential Extensions Added
+
+### File Logging Extension
+The current implementation could be extended to support file-based logging, which would provide several benefits:
+
+1. **Persistent Logging**
+   - Logs persist across program restarts
+   - Historical data analysis capabilities
+   - Audit trail for security and compliance
+   - Performance monitoring over time
+
+2. **Implementation Considerations**
+   - File handling with proper RAII principles
+   - Thread-safe file operations
+   - Log rotation for managing file sizes
+   - Timestamp-based log entries
+   - Error handling for file operations
+
+3. **Benefits**
+   - Better debugging capabilities
+   - System monitoring and analysis
+   - Compliance and audit requirements
+   - Performance tracking over time
+   - Troubleshooting support
+
+### Singleton Pattern for Logger
+The logging system could be enhanced using the Singleton pattern:
+
+1. **Design Benefits**
+   - Single point of access for logging
+   - Consistent logging across the application
+   - Resource efficiency (single file handle)
+   - Centralized log management
+   - Simplified configuration
+
+2. **Implementation Considerations**
+   - Thread-safe singleton implementation
+   - Proper resource management
+   - Lazy initialization
+   - Memory management
+   - Configuration flexibility
+
+3. **Best Practices**
+   - Use RAII for resource management
+   - Implement proper error handling
+   - Ensure thread safety
+   - Consider log levels
+   - Implement log rotation
+   - Set appropriate file size limits
+   - Proper cleanup in destructors
+
+4. **Potential Challenges**
+   - Memory management in singleton
+   - Thread safety considerations
+   - Testing difficulties
+   - Dependency management
+   - Configuration flexibility
+
+These extensions would enhance the current implementation by providing more robust logging capabilities while maintaining the thread-safe nature of the application.
