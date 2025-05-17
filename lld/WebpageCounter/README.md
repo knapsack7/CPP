@@ -255,3 +255,177 @@ std::array<std::unique_ptr<std::mutex>, MAX_PAGES> mutexes;
 - High-level modules depend on abstractions
 - `WebpageCounter` depends on `ILogger` interface
 - Not on concrete `Logger` implementation 
+
+
+## Development Errors and Solutions
+
+### 1. Mutex Double-Locking Issue
+**Problem:**
+- Initial implementation had potential for double-locking mutexer double-locking mutexe locked multiple timess
+- Same mutex could be locked multiple times ogram hangs
+
+**Solution:**
+- Added duplicate removal iLed to deadlocks and program hangs
+
+**Solution:**
+- Added duplicate removal iis locked only once
+- Implemented proper mutex validation checks
+
+**Key Concept:**
+- Deadlock: A situation where a tn batch operations
+- Used `std::sort` and `std::unique` to ensure each mutex is locked only once
+- Implemented proper mutex validation checks
+
+**Key Concept:**
+- Deadlock: A situation where a t2. Atomic Operations Issue
+**Problem:**
+- Initial implementation used `std::vector`  that it holds
+- Mutex Locking: Each mutex should be locked only once by the same thread
+- Batch Operations: Need special handling to prevent multiple locks
+
+### 2. Atomic Operations Issue
+**Problem:**
+- Initial implementation used `std::vector` , std::memory_order_relaxed)`
+- Consistent memory ordering across all operationsfor atomic integers
+- Atomic types are not copyable or movable
+- Led to compilation errors during vector operations
+
+**Solution:**
+- Used `std::array` instead of `std::vector` for atomic integers
+- Properly initialized atomic values with `store(0, std::memory_order_relaxed)`
+- Consistent memory ordering across all operationsions on variables
+- Memory Ordering: Controls how atomic operations are synchronized
+- `std::array`: Fixed-size container that doesn't require copy/move operations
+
+### 3. Container Choice and Cache Locality
+**rmance
+- Improved cache locality with contiguous memory layout
+
+**Key Concept:**
+- Cache Locality: Keeping rn used `std::vector` for storage
+- Dynamic allocation led to poor cache locality
+- Unnecessary heap allocation for fixed-size data
+
+**Solution:**
+- Used `std::array` for fixed-size storage
+- Leveraged stack allocation for better performance
+- Improved cache locality with contiguous memory layout
+
+**Key Concept:**
+- Cache Locality: Keeping r- Led to segmentatioelated data close in memory for faster access
+- Stack vs Heap: Stack allocation is faster and more cache-friendly
+- Memory Layout: Contiguous memory access patterns improve performance
+
+### 4. Logger Management Issue
+**Problem:**
+- Initial implementation used raw pointers for logger
+- Logger was being destroyed after constructor completion
+- Led to segmentatio::unique_ptr`: Smart pointer that ensures single ownership and aut to use the logger
+
+**Solution:**
+- Used `std::unique_ptr<ILogger>` for proper ownership
+- Ensured logger lifetime matches the WebpageCounter lifetime
+- Implemented RAII (Resource Acquisition Is Initialization) principles
+
+**Key Concept:**
+- RAII: A programming idiom where resource acquisition and release are bound to object lifetime
+- `std::unique_ptr`: Smart pointer that ensures single ownership and autement
+- Validation: Checking preconditions before operations
+- Error Messages: Clear and descriptive errssages
+- Implemented proper validation of all operations
+- Consistent error handling across the codebase
+
+**Key Concept:**
+- Exception Handling: Using try-catch blocks for error management
+- Validation: Checking preconditions before operations
+- Error Messages: Clear and descriptive errnding the design decisions made
+3. Learning from the challenges faced
+4. Avoiding similar issues in future development
+
+### Batch Increment Efficiency
+
+**Why Batch Increment is More Efficient Than Single Increment**
+
+1. **Reduced Lock Operations**
+```cpp
+// Single Increment (3 pages):
+incrementVisitCount(0);  // Lock 0, increment, unlock 0
+incrementVisitCount(1);  // Lock 1, increment, unlock 1
+incrementVisitCount(2);  // Lock 2, increment, unlock 2
+// Total: 6 lock/unlock operations
+
+// Batch Increment (3 pages):
+batchIncrement({0, 1, 2});
+// Lock 0, 1, 2 once
+// Perform all increments
+// Unlock 0, 1, 2 once
+// Total: 6 lock/unlock operations
+```
+
+2. **Atomic Operation Optimization**
+```cpp
+// Single Increment:
+visitCounts[0].fetch_add(1);  // Atomic operation
+visitCounts[1].fetch_add(1);  // Atomic operation
+visitCounts[2].fetch_add(1);  // Atomic operation
+// Each increment is a separate atomic operation
+
+// Batch Increment:
+// All increments happen while holding the lock
+// Can use relaxed memory ordering
+// Better cache utilization
+```
+
+3. **Cache Locality Benefits**
+```cpp
+// Single Increment:
+// Each increment might cause cache misses
+// Memory access pattern is scattered
+
+// Batch Increment:
+// All increments happen in sequence
+// Better cache locality
+// Reduced memory access overhead
+```
+
+4. **Thread Synchronization**
+```cpp
+// Single Increment:
+// Each increment requires thread synchronization
+// More context switches
+// More thread scheduling overhead
+
+// Batch Increment:
+// Single synchronization point
+// Fewer context switches
+// Better thread scheduling
+```
+
+5. **Performance Metrics**
+- Reduced number of lock/unlock operations
+- Better cache utilization
+- Fewer thread synchronizations
+- More efficient memory access patterns
+- Reduced overhead in thread scheduling
+
+6. **Real-World Impact**
+```cpp
+// Example: Incrementing 1000 pages
+// Single Increment:
+// - 2000 lock/unlock operations
+// - 1000 atomic operations
+// - 1000 potential cache misses
+
+// Batch Increment:
+// - 2000 lock/unlock operations
+// - 1000 atomic operations
+// - Better cache locality
+// - Single synchronization point
+```
+
+7. **Best Practices for Batch Operations**
+- Use batch operations for multiple increments
+- Remove duplicates to prevent double-locking
+- Lock all required mutexes at once
+- Perform all increments while holding locks
+- Unlock all mutexes at once

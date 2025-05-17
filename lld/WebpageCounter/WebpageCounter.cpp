@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <string>
 #include <array>
+#include <thread>
 
 // Custom exceptions
 class InvalidPageIndex : public std::runtime_error {
@@ -68,14 +69,14 @@ private:
     std::array<std::atomic<size_t>, MAX_PAGES> visitCounts;
     std::array<std::unique_ptr<std::mutex>, MAX_PAGES> mutexes;
     std::unique_ptr<ILogger> logger;  // Keep the unique_ptr
-    int totalPages;
+    size_t totalPages;
     mutable Metrics metrics;
     Config config;
 
 public:
     // Constructor instead of init method
     // if no config is provided, it will use the default config
-    WebpageCounter(int totalPages, std::unique_ptr<ILogger> logger, const Config& config = Config{})
+    WebpageCounter(size_t totalPages, std::unique_ptr<ILogger> logger, const Config& config = Config{})
         : totalPages(totalPages)
         , logger(std::move(logger))  // Move the logger
         , config(config)
@@ -94,7 +95,7 @@ public:
             throw std::invalid_argument("Total pages must be positive");
         }
 
-        if (static_cast<size_t>(totalPages) > MAX_PAGES) {
+        if (totalPages > MAX_PAGES) {
             throw std::invalid_argument("Total pages exceeds maximum allowed");
         }
         std::cout << "Bounds checking passed..." << std::endl;
@@ -148,20 +149,21 @@ public:
     // Single page increment
     void incrementVisitCount(int pageIndex) {
         if (pageIndex < 0 || pageIndex >= totalPages) {
+            // increment the error count
             metrics.errorCount.fetch_add(1, std::memory_order_relaxed);
             throw InvalidPageIndex(pageIndex);
         }
 
         if (config.useAtomicOperations) {
             visitCounts[pageIndex].fetch_add(1, std::memory_order_relaxed);
-        } else {
+        } else { // if not using atomic operations, we need to lock the mutex
             if (!mutexes[pageIndex]) {
                 throw std::runtime_error("Mutex not initialized for page " + std::to_string(pageIndex));
             }
             std::lock_guard<std::mutex> lock(*mutexes[pageIndex]);
             visitCounts[pageIndex].store(visitCounts[pageIndex].load(std::memory_order_relaxed) + 1, std::memory_order_relaxed);
         }
-        
+        // increment the total increments
         metrics.totalIncrements.fetch_add(1, std::memory_order_relaxed);
         
         if (config.enableLogging) {
@@ -213,6 +215,7 @@ public:
         if (config.enableLogging) {
             logger->log("Batch incremented " + std::to_string(sortedIndices.size()) + " pages");
         }
+        // Locks are automatically released when 'locks' vector goes out of scope
     }
 
     // Get visit count
@@ -288,16 +291,51 @@ int main() {
         WebpageCounter counter(2, std::move(logger), config);
         std::cout << "WebpageCounter initialized successfully" << std::endl;
         
-        std::cout << "Performing single page increments..." << std::endl;
+        // Test Case 1: Single thread operations
+        std::cout << "\nTest Case 1: Single thread operations" << std::endl;
         counter.incrementVisitCount(0);
-        std::cout << "Incremented page 0" << std::endl;
         counter.incrementVisitCount(1);
-        std::cout << "Incremented page 1" << std::endl;
+        std::cout << "Page 0 visits: " << counter.getVisitCount(0) << std::endl;
+        std::cout << "Page 1 visits: " << counter.getVisitCount(1) << std::endl;
         
-        std::cout << "Performing batch increment..." << std::endl;
-        std::vector<int> batchIndices = {1, 1, 0};
-        counter.batchIncrement(batchIndices);
-        std::cout << "Batch increment completed" << std::endl;
+        std::cout << "\nResetting counters..." << std::endl;
+        counter.reset();
+        std::cout << "After reset - Page 0 visits: " << counter.getVisitCount(0) << std::endl;
+        std::cout << "After reset - Page 1 visits: " << counter.getVisitCount(1) << std::endl;
+        
+        // Test Case 2: Multithreaded operations
+        std::cout << "\nTest Case 2: Multithreaded operations" << std::endl;
+        std::vector<std::thread> threads;
+        const int numThreads = 4;
+        const int incrementsPerThread = 1000;
+
+        std::cout << "Starting " << numThreads << " threads, each performing " 
+                  << incrementsPerThread << " increments..." << std::endl;
+
+        // Create threads that will concurrently increment page 0
+        for (int i = 0; i < numThreads; ++i) {
+            threads.emplace_back([&counter, incrementsPerThread]() {
+                for (int j = 0; j < incrementsPerThread; ++j) {
+                    counter.incrementVisitCount(0);
+                }
+            });
+        }
+
+        // Create threads that will concurrently increment page 1
+        for (int i = 0; i < numThreads; ++i) {
+            threads.emplace_back([&counter, incrementsPerThread]() {
+                for (int j = 0; j < incrementsPerThread; ++j) {
+                    counter.incrementVisitCount(1);
+                }
+            });
+        }
+
+        // Wait for all threads to complete
+        for (auto& thread : threads) {
+            thread.join();
+        }
+        
+        std::cout << "All threads completed" << std::endl;
         
         std::cout << "Retrieving visit counts..." << std::endl;
         int count0 = counter.getVisitCount(0);
@@ -310,6 +348,11 @@ int main() {
         std::cout << "Total increments: " << metrics.totalIncrements << std::endl;
         std::cout << "Total queries: " << metrics.totalQueries << std::endl;
         std::cout << "Error count: " << metrics.errorCount << std::endl;
+        
+        std::cout << "\nResetting counters again..." << std::endl;
+        counter.reset();
+        std::cout << "Final check after reset - Page 0 visits: " << counter.getVisitCount(0) << std::endl;
+        std::cout << "Final check after reset - Page 1 visits: " << counter.getVisitCount(1) << std::endl;
         
         std::cout << "WebpageCounter Test Completed Successfully!" << std::endl;
         
