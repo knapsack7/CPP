@@ -56,11 +56,30 @@ public:
 
 // Concrete Logger implementation
 class Logger : public ILogger {
+private:
+    static std::shared_ptr<Logger> instance;
+    
+    Logger() = default;  // Private constructor
+    Logger(const Logger&) = delete;
+    Logger& operator=(const Logger&) = delete;
+    Logger(Logger&&) = delete;
+    Logger& operator=(Logger&&) = delete;
+    
 public:
+    static std::shared_ptr<Logger> getInstance() {
+        if (!instance) {
+            instance = std::shared_ptr<Logger>(new Logger());
+        }
+        return instance;
+    }
+    
     void log(const std::string& message) override {
         std::cout << message << std::endl;
     }
 };
+
+// Initialize static member
+std::shared_ptr<Logger> Logger::instance = nullptr;
 
 // Main WebpageCounter class
 class WebpageCounter {
@@ -68,7 +87,7 @@ private:
     static constexpr size_t MAX_PAGES = 1000; // modern c++ style to use constexpr to inline define MAX_PAGES static member
     std::array<std::atomic<size_t>, MAX_PAGES> visitCounts;
     std::array<std::unique_ptr<std::mutex>, MAX_PAGES> mutexes;
-    std::unique_ptr<ILogger> logger;  // Keep the unique_ptr
+    std::shared_ptr<ILogger> logger;  // Changed to shared_ptr
     size_t totalPages;
     mutable Metrics metrics;
     Config config;
@@ -76,7 +95,7 @@ private:
 public:
     // Constructor instead of init method
     // if no config is provided, it will use the default config
-    WebpageCounter(size_t totalPages, std::unique_ptr<ILogger> logger, const Config& config = Config{})
+    WebpageCounter(size_t totalPages, std::shared_ptr<ILogger> logger, const Config& config = Config{})
         : totalPages(totalPages)
         , logger(std::move(logger))  // Move the logger
         , config(config)
@@ -282,7 +301,7 @@ int main() {
         std::cout << "Configuration set: Logging enabled, Atomic operations enabled" << std::endl;
 
         std::cout << "Creating logger..." << std::endl;
-        auto logger = std::make_unique<Logger>();
+        auto logger = Logger::getInstance();  // Get singleton instance as shared_ptr
         if (!logger) {
             throw std::runtime_error("Failed to create logger");
         }
