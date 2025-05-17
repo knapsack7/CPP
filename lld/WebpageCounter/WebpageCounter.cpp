@@ -52,15 +52,15 @@ struct Metrics {
 class ILogger {
 public:
     virtual void log(const std::string& message) = 0;
-    virtual ~ILogger() = default;
+    virtual ~ILogger() = default; // must virtual destructor to avoid memory leak
 };
 
 // Concrete Logger implementation
 class Logger : public ILogger {
 private:
-    static std::shared_ptr<Logger> instance;
-    static std::ofstream logFile;
-    static std::mutex logMutex;
+    inline static std::shared_ptr<Logger> instance = nullptr;
+    inline static std::ofstream logFile;
+    inline static std::mutex logMutex;
 
     Logger() = default;
     Logger(const Logger&) = delete;
@@ -89,9 +89,9 @@ public:
 };
 
 // Initialize static members
-std::shared_ptr<Logger> Logger::instance = nullptr;
-std::ofstream Logger::logFile;
-std::mutex Logger::logMutex;
+// std::shared_ptr<Logger> Logger::instance = nullptr;
+// std::ofstream Logger::logFile;
+// std::mutex Logger::logMutex;
 
 // Main WebpageCounter class
 class WebpageCounter {
@@ -105,13 +105,12 @@ private:
     Config config;
 
 public:
-    // Constructor instead of init method
-    // if no config is provided, it will use the default config
+    // Constructor with correct initialization order
     WebpageCounter(size_t totalPages, std::shared_ptr<ILogger> logger, const Config& config = Config{})
-        : totalPages(totalPages)
-        , logger(std::move(logger))  // Move the logger
-        , config(config)
+        : logger(std::move(logger))  // Move the logger
+        , totalPages(totalPages)
         , metrics()  // default initialize metrics
+        , config(config)
     {
         std::cout << "Starting constructor initialization..." << std::endl;
 
@@ -135,7 +134,7 @@ public:
             std::cout << "Starting array initialization..." << std::endl;
             
             // Initialize visit counts and create mutexes
-            for (int i = 0; i < totalPages; ++i) {
+            for (size_t i = 0; i < totalPages; ++i) {
                 std::cout << "Initializing page " << i << "..." << std::endl;
                 
                 try {
@@ -156,7 +155,7 @@ public:
             }
 
             // Verify initialization
-            for (int i = 0; i < totalPages; ++i) {
+            for (size_t i = 0; i < totalPages; ++i) {
                 if (!mutexes[i]) {
                     throw std::runtime_error("Mutex verification failed for page " + std::to_string(i));
                 }
@@ -178,11 +177,10 @@ public:
     }
 
     // Single page increment
-    void incrementVisitCount(int pageIndex) {
-        if (pageIndex < 0 || pageIndex >= totalPages) {
-            // increment the error count
+    void incrementVisitCount(size_t pageIndex) {
+        if (pageIndex >= totalPages) {
             metrics.errorCount.fetch_add(1, std::memory_order_relaxed);
-            throw InvalidPageIndex(pageIndex);
+            throw InvalidPageIndex(static_cast<int>(pageIndex));
         }
 
         if (config.useAtomicOperations) {
@@ -203,27 +201,23 @@ public:
     }
 
     // Batch increment
-    void batchIncrement(const std::vector<int>& indices) {
+    void batchIncrement(const std::vector<size_t>& indices) {
         if (indices.empty()) {
             return;
         }
 
-        // Sort indices to prevent deadlock
-        std::vector<int> sortedIndices = indices;
+        std::vector<size_t> sortedIndices = indices;
         std::sort(sortedIndices.begin(), sortedIndices.end());
-        
-        // Remove duplicates to avoid locking the same mutex twice
         sortedIndices.erase(std::unique(sortedIndices.begin(), sortedIndices.end()), sortedIndices.end());
         
-        // Create a vector of unique_locks
         std::vector<std::unique_lock<std::mutex>> locks;
         locks.reserve(sortedIndices.size());
         
         // Try to acquire all locks
-        for (int index : sortedIndices) {
+        for (size_t index : sortedIndices) {
             if (index < 0 || index >= totalPages) {
                 metrics.errorCount.fetch_add(1, std::memory_order_relaxed);
-                throw InvalidPageIndex(index);
+                throw InvalidPageIndex(static_cast<int>(index));
             }
             if (!mutexes[index]) {
                 throw std::runtime_error("Mutex not initialized for page " + std::to_string(index));
@@ -238,7 +232,7 @@ public:
         }
         
         // All locks acquired, perform the increments
-        for (int index : sortedIndices) {
+        for (size_t index : sortedIndices) {
             visitCounts[index].fetch_add(1, std::memory_order_relaxed);
             metrics.totalIncrements.fetch_add(1, std::memory_order_relaxed);
         }
@@ -250,10 +244,10 @@ public:
     }
 
     // Get visit count
-    int getVisitCount(int pageIndex) const {
-        if (pageIndex < 0 || pageIndex >= totalPages) {
+    size_t getVisitCount(size_t pageIndex) const {
+        if (pageIndex >= totalPages) {
             metrics.errorCount.fetch_add(1, std::memory_order_relaxed);
-            throw InvalidPageIndex(pageIndex);
+            throw InvalidPageIndex(static_cast<int>(pageIndex));
         }
 
         int count;
@@ -287,7 +281,7 @@ public:
         std::vector<std::unique_lock<std::mutex>> locks;
         locks.reserve(totalPages);
         
-        for (int i = 0; i < totalPages; ++i) {
+        for (size_t i = 0; i < totalPages; ++i) {
             if (!mutexes[i]) {
                 throw std::runtime_error("Mutex not initialized for page " + std::to_string(i));
             }
@@ -345,7 +339,7 @@ int main() {
 
         // Create threads that will concurrently increment page 0
         for (int i = 0; i < numThreads; ++i) {
-            threads.emplace_back([&counter, incrementsPerThread]() {
+            threads.emplace_back([&counter]() {
                 for (int j = 0; j < incrementsPerThread; ++j) {
                     counter.incrementVisitCount(0);
                 }
@@ -354,7 +348,7 @@ int main() {
 
         // Create threads that will concurrently increment page 1
         for (int i = 0; i < numThreads; ++i) {
-            threads.emplace_back([&counter, incrementsPerThread]() {
+            threads.emplace_back([&counter]() {
                 for (int j = 0; j < incrementsPerThread; ++j) {
                     counter.incrementVisitCount(1);
                 }
