@@ -8,6 +8,7 @@
 #include <string>
 #include <array>
 #include <thread>
+#include <fstream>  // Added for file operations
 
 // Custom exceptions
 class InvalidPageIndex : public std::runtime_error {
@@ -58,8 +59,10 @@ public:
 class Logger : public ILogger {
 private:
     static std::shared_ptr<Logger> instance;
-    
-    Logger() = default;  // Private constructor
+    static std::ofstream logFile;
+    static std::mutex logMutex;
+
+    Logger() = default;
     Logger(const Logger&) = delete;
     Logger& operator=(const Logger&) = delete;
     Logger(Logger&&) = delete;
@@ -74,12 +77,21 @@ public:
     }
     
     void log(const std::string& message) override {
-        std::cout << message << std::endl;
+        std::lock_guard<std::mutex> lock(logMutex);
+        if (!logFile.is_open()) {
+            logFile.open("log.txt", std::ios::out);  // Open in write mode
+        }
+        if (logFile.is_open()) {
+            logFile << message << std::endl;
+            logFile.flush();  // Ensure immediate writing
+        }
     }
 };
 
-// Initialize static member
+// Initialize static members
 std::shared_ptr<Logger> Logger::instance = nullptr;
+std::ofstream Logger::logFile;
+std::mutex Logger::logMutex;
 
 // Main WebpageCounter class
 class WebpageCounter {
