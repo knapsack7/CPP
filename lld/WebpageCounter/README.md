@@ -489,3 +489,65 @@ The logging system could be enhanced using the Singleton pattern:
    - Configuration flexibility
 
 These extensions would enhance the current implementation by providing more robust logging capabilities while maintaining the thread-safe nature of the application.
+
+## Project Structure
+
+```
+WebpageCounter/
+├── include/                    # Header files
+│   ├── WebpageCounter.h       # Main counter class declaration
+│   └── Logger.h               # Logger interface and implementation
+├── src/                       # Source files
+│   ├── WebpageCounter.cpp     # Counter implementation
+│   ├── Logger.cpp            # Logger implementation
+│   └── main.cpp              # Example usage program
+├── tests/                     # Test files
+│   └── WebpageCounterTest.cpp # Unit tests and integration tests
+├── build/                     # Build directory (generated)
+│   └── bin/                   # Compiled executables
+├── CMakeLists.txt            # CMake build configuration
+└── README.md                 # This file
+```
+
+### Key Components
+
+1. **Header Files** (`include/`)
+   - `WebpageCounter.h`: Contains the main counter class declaration, including:
+     - Thread-safe visit counting
+     - Atomic operations support
+     - Metrics tracking
+     - Configuration options
+   - `Logger.h`: Defines the logging interface and implementation
+
+2. **Source Files** (`src/`)
+   - `WebpageCounter.cpp`: Implements the counter functionality:
+     - Visit count tracking
+     - Thread synchronization
+     - Error handling
+     - Metrics collection
+   - `Logger.cpp`: Implements logging functionality
+   - `main.cpp`: Example program demonstrating usage
+
+3. **Test Files** (`tests/`)
+   - `WebpageCounterTest.cpp`: Comprehensive test suite including:
+     - Single-threaded operations
+     - Multi-threaded operations
+     - Error handling
+     - Reset functionality
+     - Metrics verification
+
+4. **Build System**
+   - `CMakeLists.txt`: CMake configuration for:
+     - C++17 standard
+     - Compiler warnings
+     - Thread support
+     - Test integration
+     - Output directory structure
+
+### Build Output
+
+The build process generates:
+- `webpage_counter`: Main executable
+- `webpage_counter_test`: Test executable
+
+Both executables are placed in the `build/bin/` directory.
