@@ -1,0 +1,41 @@
+# Build directories
+build/
+out/
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.a
+*.lib
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+Testing/
+install_manifest.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+*.swp
+*~
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# GoogleTest build
+_deps/
+
+# IDE specific files
+.idea/
+*.iml
+*.ipr
+*.iws 
