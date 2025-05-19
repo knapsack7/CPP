@@ -4,12 +4,16 @@ bin/
 lib/
 out/
 cmake-build-*/
+../../build/
+../build/
 
 # Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
+helloworld.o
+helloworld 2.o
 
 # Precompiled Headers
 *.gch
@@ -31,6 +35,8 @@ cmake-build-*/
 *.out
 *.app
 WebpageCounter
+outDebug
+outDebug 2
 
 # CMake generated files
 CMakeCache.txt
@@ -40,6 +46,7 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+Makefile
 
 # IDE specific files
 .vscode/
