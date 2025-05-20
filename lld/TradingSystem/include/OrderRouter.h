@@ -8,7 +8,10 @@
 #include <queue>
 #include <thread>
 #include <atomic>
+#include <condition_variable>
 #include "TradingTypes.h"
+#include "Protocol.h"
+#include "RiskManager.h"
 
 namespace TradingSystem {
 
@@ -20,6 +23,18 @@ public:
     // Prevent copying
     OrderRouter(const OrderRouter&) = delete;
     OrderRouter& operator=(const OrderRouter&) = delete;
+
+    // Core operations
+    void start();
+    void stop();
+    void processOrder(const trading::Order& order);
+    void cancelOrder(const std::string& order_id);
+
+    // Risk management
+    void setPositionLimit(const std::string& client_id, const std::string& symbol, int limit);
+    void setPriceLimit(const std::string& symbol, double min_price, double max_price);
+    void setDailyLimit(const std::string& client_id, double limit);
+    int getPosition(const std::string& client_id, const std::string& symbol) const;
 
     // Order management
     OrderResponse processOrder(const OrderRequest& request);
@@ -35,34 +50,26 @@ public:
     void setMarketDataCallback(MarketDataCallback callback);
 
 private:
-    // Order storage
-    struct OrderInfo {
-        Order order;
-        std::chrono::system_clock::time_point timestamp;
-        std::string client_id;
-    };
+    // Order processing
+    void processOrders();
+    void handleOrder(const trading::Order& order);
+    void handleCancel(const std::string& order_id);
+    void updateOrderStatus(const std::string& order_id, trading::OrderStatus status);
+    void notifyOrderUpdate(const trading::OrderResponse& response);
 
-    std::unordered_map<std::string, OrderInfo> orders_;
+    // Core components
+    std::queue<trading::Order> order_queue_;
+    std::unordered_map<std::string, trading::Order> active_orders_;
+    std::mutex queue_mutex_;
     std::mutex orders_mutex_;
+    std::condition_variable queue_cv_;
+    std::thread processing_thread_;
+    std::atomic<bool> running_;
+    RiskManager risk_manager_;
 
     // Callbacks
     OrderCallback order_callback_;
     MarketDataCallback market_data_callback_;
-
-    // Processing thread
-    std::thread processing_thread_;
-    std::atomic<bool> running_{false};
-    std::queue<OrderRequest> order_queue_;
-    std::mutex queue_mutex_;
-    std::condition_variable queue_condition_;
-
-    // Internal methods
-    void processOrderQueue();
-    void validateOrder(const Order& order, OrderResponse& response);
-    void matchOrder(const Order& order, OrderResponse& response);
-    void updateOrderStatus(const std::string& order_id, OrderStatus status);
-    void notifyOrderUpdate(const OrderResponse& response);
-    void notifyMarketData(const MarketDataResponse& response);
 };
 
 } // namespace TradingSystem 

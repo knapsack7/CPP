@@ -55,6 +55,208 @@ The trading system is built as a simple client-server system. Here's how it work
 
 This design makes the system fast, reliable, and easy to understand.
 
+## Event Loop Implementation
+
+The Event Loop is a crucial component that manages asynchronous events and tasks in the trading system. Here's how to implement it:
+
+### 1. Event Loop Structure
+```cpp
+class EventLoop {
+private:
+    std::priority_queue<Event, std::vector<Event>, EventComparator> event_queue_;
+    std::atomic<bool> running_;
+    std::mutex mutex_;
+    std::condition_variable cv_;
+};
+```
+
+### 2. Event Class Definition
+```cpp
+struct Event {
+    int64_t priority;      // Higher number = higher priority
+    std::function<void()> callback;
+    std::chrono::steady_clock::time_point scheduled_time;
+};
+```
+
+### 3. Implementation Steps
+
+1. **Initialize Event Loop**
+   ```cpp
+   void EventLoop::start() {
+       running_ = true;
+       while (running_) {
+           processEvents();
+       }
+   }
+   ```
+
+2. **Schedule Events**
+   ```cpp
+   void EventLoop::scheduleEvent(Event event) {
+       std::lock_guard<std::mutex> lock(mutex_);
+       event_queue_.push(event);
+       cv_.notify_one();
+   }
+   ```
+
+3. **Process Events**
+   ```cpp
+   void EventLoop::processEvents() {
+       std::unique_lock<std::mutex> lock(mutex_);
+       if (event_queue_.empty()) {
+           cv_.wait(lock);
+           return;
+       }
+       
+       Event event = event_queue_.top();
+       event_queue_.pop();
+       lock.unlock();
+       
+       event.callback();
+   }
+   ```
+
+4. **Stop Event Loop**
+   ```cpp
+   void EventLoop::stop() {
+       running_ = false;
+       cv_.notify_all();
+   }
+   ```
+
+### 4. Usage Example
+```cpp
+EventLoop eventLoop;
+
+// Schedule a high-priority event
+Event highPriorityEvent{
+    .priority = 100,
+    .callback = []() { /* handle high priority task */ },
+    .scheduled_time = std::chrono::steady_clock::now()
+};
+eventLoop.scheduleEvent(highPriorityEvent);
+
+// Schedule a low-priority event
+Event lowPriorityEvent{
+    .priority = 10,
+    .callback = []() { /* handle low priority task */ },
+    .scheduled_time = std::chrono::steady_clock::now()
+};
+eventLoop.scheduleEvent(lowPriorityEvent);
+```
+
+### 5. Best Practices
+
+1. **Priority Management**
+   - Use clear priority levels
+   - Document priority ranges
+   - Consider priority inheritance
+
+2. **Error Handling**
+   - Catch exceptions in callbacks
+   - Log errors appropriately
+   - Implement retry mechanisms
+
+3. **Performance Optimization**
+   - Use efficient data structures
+   - Minimize lock contention
+   - Implement event batching
+
+4. **Testing**
+   - Unit test event scheduling
+   - Test priority ordering
+   - Verify event execution
+   - Test error handling
+
+### 6. Event Types: Solicited vs Unsolicited
+
+In the trading system, events can be classified into two main categories:
+
+#### Solicited Events
+These are events that are triggered in response to a specific client request or action.
+
+Examples:
+```cpp
+// 1. Order Placement Event (Solicited)
+Event orderPlacementEvent{
+    .priority = 100,
+    .callback = [&]() {
+        // Process order placement request
+        Order order = client.getPendingOrder();
+        risk_manager.validateOrder(order);
+        order_router.processOrder(order);
+    },
+    .scheduled_time = std::chrono::steady_clock::now()
+};
+
+// 2. Market Data Subscription Event (Solicited)
+Event subscriptionEvent{
+    .priority = 80,
+    .callback = [&]() {
+        // Process market data subscription request
+        std::string symbol = client.getSubscriptionSymbol();
+        market_data_stream.addSubscriber(symbol, client);
+    },
+    .scheduled_time = std::chrono::steady_clock::now()
+};
+```
+
+#### Unsolicited Events
+These are events that occur automatically or are triggered by the system without a direct client request.
+
+Examples:
+```cpp
+// 1. Market Data Update Event (Unsolicited)
+Event marketDataEvent{
+    .priority = 90,
+    .callback = [&]() {
+        // Broadcast market data updates to all subscribers
+        MarketData data = market_data_stream.getLatestData();
+        for (auto& subscriber : market_data_stream.getSubscribers()) {
+            subscriber->onMarketDataUpdate(data);
+        }
+    },
+    .scheduled_time = std::chrono::steady_clock::now()
+};
+
+// 2. Risk Limit Check Event (Unsolicited)
+Event riskCheckEvent{
+    .priority = 95,
+    .callback = [&]() {
+        // Periodic risk limit monitoring
+        for (auto& client : risk_manager.getActiveClients()) {
+            if (risk_manager.checkDailyLimit(client)) {
+                notifyRiskLimitBreach(client);
+            }
+        }
+    },
+    .scheduled_time = std::chrono::steady_clock::now() + std::chrono::minutes(5)
+};
+```
+
+#### Implementation Considerations
+
+1. **Priority Assignment**
+   - Solicited events typically have higher priority
+   - Unsolicited events may have lower priority unless critical
+   - System health checks should have highest priority
+
+2. **Error Handling**
+   - Solicited events require immediate error feedback to clients
+   - Unsolicited events should log errors and retry if necessary
+   - System events should have robust error recovery
+
+3. **Resource Management**
+   - Solicited events should have timeout mechanisms
+   - Unsolicited events should be rate-limited
+   - System events should monitor resource usage
+
+4. **Testing Strategy**
+   - Test solicited events with client request simulation
+   - Test unsolicited events with time-based triggers
+   - Verify event ordering and priority handling
+
 ## Features
 - Client-server architecture
 - Custom protocol implementation
@@ -320,3 +522,269 @@ int main() {
 - Implemented proper exception handling
 - Added logging for debugging purposes
 - Improved error messages for better debugging 
+
+# Trading System
+
+A high-performance, real-time trading system implemented in C++.
+
+## Features
+
+- Real-time order processing with priority-based execution
+- Event-driven architecture for efficient message handling
+- Comprehensive risk management system
+- Thread-safe operations with mutex protection
+- Asynchronous I/O using Boost.Asio
+- Protocol Buffers for efficient message serialization
+- Unit tests with Google Test framework
+
+## Architecture
+
+### Core Components
+
+1. **Client**
+   - Handles client connections and message processing
+   - Manages order submission and market data subscription
+   - Implements asynchronous I/O operations
+
+2. **Server**
+   - Manages multiple client connections
+   - Processes incoming orders and market data requests
+   - Broadcasts market data updates to subscribed clients
+
+3. **Order Router**
+   - Routes orders to appropriate handlers
+   - Implements priority-based order processing
+   - Integrates with risk management system
+
+4. **Risk Manager**
+   - Validates orders against position limits
+   - Enforces price limits for symbols
+   - Tracks daily trading limits per client
+   - Thread-safe position tracking
+
+5. **Event Loop**
+   - Manages event scheduling and execution
+   - Supports priority-based event processing
+   - Handles event cancellation
+   - Exception-safe event execution
+
+### Design Patterns
+
+- Observer Pattern for market data updates
+- Factory Pattern for message creation
+- Strategy Pattern for order processing
+- Singleton Pattern for global services
+
+### Network Programming Concepts
+
+- TCP/IP communication
+- Asynchronous I/O operations
+- Connection pooling
+- Message framing and serialization
+
+## Risk Management
+
+The system implements comprehensive risk management through the `RiskManager` class:
+
+- **Position Limits**: Enforces maximum position sizes per client and symbol
+- **Price Limits**: Validates order prices against configured min/max limits
+- **Daily Limits**: Tracks and enforces daily trading limits per client
+- **Thread Safety**: All risk checks and updates are thread-safe
+
+Example usage:
+```cpp
+// Set position limit for a client
+risk_manager.setPositionLimit("client1", "AAPL", 1000);
+
+// Set price limits for a symbol
+risk_manager.setPriceLimit("AAPL", 100.0, 200.0);
+
+// Set daily trading limit
+risk_manager.setDailyLimit("client1", 100000.0);
+```
+
+## Event-Driven Architecture
+
+The system uses an event-driven architecture through the `EventLoop` class:
+
+- **Priority-based Execution**: Events are executed based on their priority
+- **Event Scheduling**: Supports scheduling events with different priorities
+- **Event Cancellation**: Allows canceling scheduled events
+- **Exception Handling**: Safely handles exceptions during event execution
+
+Example usage:
+```cpp
+// Schedule a high-priority event
+event_loop.scheduleEvent([]() {
+    // Handle critical operation
+}, 1);  // Priority 1 (highest)
+
+// Schedule a low-priority event
+event_loop.scheduleEvent([]() {
+    // Handle background task
+}, 3);  // Priority 3 (lowest)
+```
+
+## Requirements
+
+- C++17 or later
+- Boost 1.74.0 or later
+- Protocol Buffers 3.15.0 or later
+- CMake 3.10 or later
+- Google Test (for testing)
+
+## Building
+
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```
+
+## Testing
+
+```bash
+cd build
+ctest
+```
+
+## Usage Examples
+
+### Starting the Server
+
+```cpp
+Server server("localhost", 8080);
+server.start();
+```
+
+### Creating a Client
+
+```cpp
+Client client("localhost", 8080);
+client.connect();
+```
+
+### Submitting an Order
+
+```cpp
+trading::Order order;
+order.set_client_id("client1");
+order.set_symbol("AAPL");
+order.set_quantity(100);
+order.set_price(150.0);
+client.submitOrder(order);
+```
+
+### Subscribing to Market Data
+
+```cpp
+client.subscribeMarketData("AAPL", [](const MarketData& data) {
+    // Handle market data update
+});
+```
+
+## Performance Considerations
+
+- Use of asynchronous I/O for efficient network operations
+- Thread-safe operations with minimal locking
+- Priority-based event processing
+- Efficient message serialization with Protocol Buffers
+
+## Troubleshooting
+
+1. **Connection Issues**
+   - Check server address and port
+   - Verify firewall settings
+   - Check network connectivity
+
+2. **Build Issues**
+   - Ensure all dependencies are installed
+   - Check CMake version
+   - Verify compiler version
+
+3. **Runtime Issues**
+   - Check log files
+   - Verify configuration settings
+   - Monitor system resources
+
+## Best Practices
+
+1. **Error Handling**
+   - Use try-catch blocks for exception handling
+   - Log errors with appropriate context
+   - Implement graceful error recovery
+
+2. **Resource Management**
+   - Use RAII for resource management
+   - Implement proper cleanup in destructors
+   - Monitor memory usage
+
+3. **Thread Safety**
+   - Use mutexes for shared resource access
+   - Implement proper synchronization
+   - Avoid deadlocks
+
+## Future Improvements
+
+1. **Performance**
+   - Implement connection pooling
+   - Add message compression
+   - Optimize serialization
+
+2. **Features**
+   - Add support for more order types
+   - Implement order matching engine
+   - Add market data persistence
+
+3. **Monitoring**
+   - Add performance metrics
+   - Implement health checks
+   - Add monitoring dashboard
+
+## Issues Solved
+
+1. **Protobuf Integration**
+   - Resolved architecture mismatch issues
+   - Fixed linker errors with proper library linking
+   - Implemented efficient message serialization
+
+2. **Server Connection**
+   - Fixed binding issues with proper address handling
+   - Implemented connection timeout handling
+   - Added connection state management
+
+3. **Test Execution**
+   - Resolved test fixture setup issues
+   - Fixed concurrent test execution problems
+   - Implemented proper test cleanup
+
+4. **Build System**
+   - Fixed dependency management
+   - Resolved library linking issues
+   - Implemented proper CMake configuration
+
+5. **Thread Safety**
+   - Added mutex protection for shared resources
+   - Implemented atomic variables for state management
+   - Fixed race conditions in order processing
+
+6. **Memory Management**
+   - Implemented RAII for resource management
+   - Added smart pointers for dynamic objects
+   - Fixed memory leaks in connection handling
+
+7. **Error Handling**
+   - Added comprehensive error handling
+   - Implemented proper exception handling
+   - Added logging for debugging
+
+8. **Risk Management**
+   - Implemented position limit tracking
+   - Added price limit validation
+   - Implemented daily limit monitoring
+
+9. **Event Processing**
+   - Added priority-based event scheduling
+   - Implemented event cancellation
+   - Added exception-safe event execution 

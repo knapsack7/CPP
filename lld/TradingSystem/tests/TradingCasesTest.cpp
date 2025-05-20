@@ -4,6 +4,7 @@
 #include "Server.h"
 #include <chrono>
 #include <thread>
+#include <iostream>
 
 using namespace TradingSystem;
 
@@ -45,6 +46,7 @@ protected:
 };
 
 TEST_F(TradingCasesTest, PlaceOrder) {
+    std::cout << "Testing place order functionality..." << std::endl;
     auto client = createAndConnectClient();
     
     // Test buy order
@@ -52,17 +54,27 @@ TEST_F(TradingCasesTest, PlaceOrder) {
     
     // Test sell order
     EXPECT_TRUE(client->placeOrder("AAPL", 151.0, 5, trading::OrderSide::SELL));
+    
+    // Stop the server
+    server->stop();
+    std::cout << "Place order test passed." << std::endl;
 }
 
 TEST_F(TradingCasesTest, CancelOrder) {
+    std::cout << "Testing cancel order functionality..." << std::endl;
     auto client = createAndConnectClient();
     
     // Place and cancel order
     EXPECT_TRUE(client->placeOrder("AAPL", 150.0, 10, trading::OrderSide::BUY));
     EXPECT_TRUE(client->cancelOrder("order1"));
+    
+    // Stop the server
+    server->stop();
+    std::cout << "Cancel order test passed." << std::endl;
 }
 
 TEST_F(TradingCasesTest, MarketDataSubscription) {
+    std::cout << "Testing market data subscription..." << std::endl;
     auto client = createAndConnectClient();
     
     // Subscribe to market data
@@ -71,4 +83,8 @@ TEST_F(TradingCasesTest, MarketDataSubscription) {
     
     // Unsubscribe
     EXPECT_TRUE(client->unsubscribeMarketData("AAPL", trading::MarketDataType::TRADE));
+    
+    // Stop the server
+    server->stop();
+    std::cout << "Market data subscription test passed." << std::endl;
 } 

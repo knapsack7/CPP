@@ -1,0 +1,18 @@
+This is the first log message.
+Singleton pattern ensures a single instance of the logger.
+Another log message from the same instance.
+This is the first log message.
+Singleton pattern ensures a single instance of the logger.
+Another log message from the same instance.
+This is the first log message.
+Singleton pattern ensures a single instance of the logger.
+Another log message from the same instance.
+This is the first log message.
+Singleton pattern ensures a single instance of the logger.
+Another log message from the same instance.
+This is the first log message.
+Singleton pattern ensures a single instance of the logger.
+Another log message from the same instance.
+This is the first log message.
+Singleton pattern ensures a single instance of the logger.
+Another log message from the same instance.
