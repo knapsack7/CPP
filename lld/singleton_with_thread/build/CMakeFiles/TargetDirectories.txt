@@ -1,0 +1,5 @@
+/Users/manoj/Documents/CPP/lld/singleton_with_thread/build/CMakeFiles/main.dir
+/Users/manoj/Documents/CPP/lld/singleton_with_thread/build/CMakeFiles/test_board.dir
+/Users/manoj/Documents/CPP/lld/singleton_with_thread/build/CMakeFiles/test.dir
+/Users/manoj/Documents/CPP/lld/singleton_with_thread/build/CMakeFiles/edit_cache.dir
+/Users/manoj/Documents/CPP/lld/singleton_with_thread/build/CMakeFiles/rebuild_cache.dir
