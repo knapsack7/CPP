@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package trading;
+
+enum OrderType {
+    MARKET = 0;
+    LIMIT = 1;
+    STOP = 2;
+    STOP_LIMIT = 3;
+}
+
+enum OrderSide {
+    BUY = 0;
+    SELL = 1;
+}
+
+enum OrderStatus {
+    NEW = 0;
+    PARTIALLY_FILLED = 1;
+    FILLED = 2;
+    CANCELED = 3;
+    REJECTED = 4;
+    EXPIRED = 5;
+}
+
+message Order {
+    string order_id = 1;
+    string symbol = 2;
+    double price = 3;
+    int32 quantity = 4;
+    OrderType type = 5;
+    OrderSide side = 6;
+    OrderStatus status = 7;
+    int64 timestamp = 8;
+    string client_id = 9;
+    int32 filled_quantity = 10;
+    double average_price = 11;
+}
+
+message OrderRequest {
+    string request_id = 1;
+    Order order = 2;
+}
+
+message OrderResponse {
+    string request_id = 1;
+    string order_id = 2;
+    OrderStatus status = 3;
+    string message = 4;
+}
+
+message OrderCancelRequest {
+    string request_id = 1;
+    string order_id = 2;
+    string client_id = 3;
+}
+
+message OrderCancelResponse {
+    string request_id = 1;
+    string order_id = 2;
+    bool success = 3;
+    string message = 4;
+}
+
+message OrderStatusRequest {
+    string request_id = 1;
+    string order_id = 2;
+    string client_id = 3;
+}
+
+message OrderStatusResponse {
+    string request_id = 1;
+    Order order = 2;
+} 

@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package trading;
+
+enum MarketDataType {
+    TRADE = 0;
+    QUOTE = 1;
+    DEPTH = 2;
+    SUMMARY = 3;
+}
+
+message Trade {
+    string symbol = 1;
+    double price = 2;
+    int32 quantity = 3;
+    int64 timestamp = 4;
+    string trade_id = 5;
+    bool is_buy = 6;
+}
+
+message Quote {
+    string symbol = 1;
+    double bid_price = 2;
+    int32 bid_quantity = 3;
+    double ask_price = 4;
+    int32 ask_quantity = 5;
+    int64 timestamp = 6;
+}
+
+message DepthLevel {
+    double price = 1;
+    int32 quantity = 2;
+    int32 orders = 3;
+}
+
+message Depth {
+    string symbol = 1;
+    repeated DepthLevel bids = 2;
+    repeated DepthLevel asks = 3;
+    int64 timestamp = 4;
+}
+
+message MarketSummary {
+    string symbol = 1;
+    double last_price = 2;
+    double open_price = 3;
+    double high_price = 4;
+    double low_price = 5;
+    int64 volume = 6;
+    int64 timestamp = 7;
+}
+
+message MarketDataRequest {
+    string request_id = 1;
+    string symbol = 2;
+    MarketDataType type = 3;
+    bool subscribe = 4;
+}
+
+message MarketDataResponse {
+    string request_id = 1;
+    MarketDataType type = 2;
+    oneof data {
+        Trade trade = 3;
+        Quote quote = 4;
+        Depth depth = 5;
+        MarketSummary summary = 6;
+    }
+} 

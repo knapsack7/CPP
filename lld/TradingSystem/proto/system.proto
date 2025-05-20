@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package trading;
+
+enum MessageType {
+    INFO = 0;
+    WARNING = 1;
+    ERROR = 2;
+    DEBUG = 3;
+}
+
+enum ConnectionStatus {
+    CONNECTED = 0;
+    DISCONNECTED = 1;
+    RECONNECTING = 2;
+    FAILED = 3;
+}
+
+message SystemMessage {
+    MessageType type = 1;
+    string message = 2;
+    int32 code = 3;
+    int64 timestamp = 4;
+}
+
+message Heartbeat {
+    int64 timestamp = 1;
+    string client_id = 2;
+}
+
+message ConnectionStatusUpdate {
+    ConnectionStatus status = 1;
+    string client_id = 2;
+    int64 timestamp = 3;
+    string message = 4;
+}
+
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+    string client_id = 3;
+}
+
+message LoginResponse {
+    bool success = 1;
+    string session_id = 2;
+    string message = 3;
+    int64 timestamp = 4;
+}
+
+message LogoutRequest {
+    string session_id = 1;
+    string client_id = 2;
+}
+
+message LogoutResponse {
+    bool success = 1;
+    string message = 2;
+    int64 timestamp = 3;
+} 
