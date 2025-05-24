@@ -14,7 +14,7 @@ DocumentRenderer::DocumentRenderer() {
     strategies_["image"] = std::make_unique<ImageRenderStrategy>();
 }
 
-void DocumentRenderer::registerStrategy(const std::string& type, std::unique_ptr<RenderStrategy> strategy) {
+void DocumentRenderer::registerStrategy(const std::string& type, std::unique_ptr<IRenderStrategy> strategy) {
     strategies_[type] = std::move(strategy);
 }
 

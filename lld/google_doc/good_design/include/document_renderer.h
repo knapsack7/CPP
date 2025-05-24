@@ -7,31 +7,31 @@
 #include "document.h"
 #include "document_element.h"
 
-// Abstract rendering strategy
-class RenderStrategy {
+// Interface for rendering strategy
+class IRenderStrategy {
 public:
-    virtual ~RenderStrategy() = default;
+    virtual ~IRenderStrategy() = default;
     virtual std::string render(const DocumentElement& element) = 0;
 };
 
 // Concrete strategies
-class TextRenderStrategy : public RenderStrategy {
+class TextRenderStrategy : public IRenderStrategy {
 public:
     std::string render(const DocumentElement& element) override;
 };
 
-class ImageRenderStrategy : public RenderStrategy {
+class ImageRenderStrategy : public IRenderStrategy {
 public:
     std::string render(const DocumentElement& element) override;
 };
 
 class DocumentRenderer {
 private:
-    std::map<std::string, std::unique_ptr<RenderStrategy>> strategies_;
+    std::map<std::string, std::unique_ptr<IRenderStrategy>> strategies_;
 
 public:
     DocumentRenderer();
-    void registerStrategy(const std::string& type, std::unique_ptr<RenderStrategy> strategy);
+    void registerStrategy(const std::string& type, std::unique_ptr<IRenderStrategy> strategy);
     std::string renderDocument();
 };
 
