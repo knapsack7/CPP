@@ -1,4 +1,4 @@
-#include "document_element.h"
+#include "../include/document_element.h"
 
 // TextElement implementations
 TextElement::TextElement(const std::string& content) : text(content) {}

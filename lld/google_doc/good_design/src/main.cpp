@@ -1,7 +1,7 @@
-#include "document.h"
-#include "document_element.h"
-#include "document_renderer.h"
-#include "document_storage.h"
+#include "../include/document.h"
+#include "../include/document_element.h"
+#include "../include/document_renderer.h"
+#include "../include/document_storage.h"
 #include <iostream>
 
 int main() {

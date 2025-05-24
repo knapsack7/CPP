@@ -1,4 +1,4 @@
-#include "document.h"
+#include "../include/document.h"
 
 // Initialize static member
 Document* Document::instance = nullptr;

@@ -1,8 +1,8 @@
 #ifndef DOCUMENT_STORAGE_H
 #define DOCUMENT_STORAGE_H
 
-#include <fstream>
 #include <string>
+#include <fstream>
 #include "document.h"
 #include "document_renderer.h"
 

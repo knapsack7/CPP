@@ -1,4 +1,4 @@
-#include "document_renderer.h"
+#include "../include/document_renderer.h"
 
 std::string DocumentRenderer::renderDocument() {
     std::string result;
