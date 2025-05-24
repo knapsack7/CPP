@@ -12,8 +12,8 @@ Document* Document::getInstance() {
 }
 
 // Document management methods
-void Document::addElement(std::shared_ptr<DocumentElement> element) {
-    elements.push_back(element);
+void Document::addElement(std::unique_ptr<DocumentElement> element) {
+    elements.push_back(std::move(element));
 }
 
 void Document::removeElement(size_t index) {
@@ -22,7 +22,7 @@ void Document::removeElement(size_t index) {
     }
 }
 
-const std::vector<std::shared_ptr<DocumentElement>>& Document::getElements() const {
+const std::vector<std::unique_ptr<DocumentElement>>& Document::getElements() const {
     return elements;
 }
 

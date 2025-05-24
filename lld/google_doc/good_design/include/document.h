@@ -21,17 +21,17 @@ private:
     Document(Document&&) = delete;
     Document& operator=(Document&&) = delete;
 
-    // Document elements
-    std::vector<std::shared_ptr<DocumentElement>> elements;
+    // Document elements - using unique_ptr for exclusive ownership
+    std::vector<std::unique_ptr<DocumentElement>> elements;
 
 public:
     // Get singleton instance
     static Document* getInstance();
 
     // Document management methods
-    void addElement(std::shared_ptr<DocumentElement> element);
+    void addElement(std::unique_ptr<DocumentElement> element);
     void removeElement(size_t index);
-    const std::vector<std::shared_ptr<DocumentElement>>& getElements() const;
+    const std::vector<std::unique_ptr<DocumentElement>>& getElements() const;
     void clear();
 };
 

@@ -55,6 +55,18 @@ good_design/
    - **Client-Service**: DocumentRenderer and DocumentStorage act as clients to the Document singleton service
    - Note: This is not an aggregation relationship as there's no ownership or containment
 
+7. **Ownership and Memory Management**
+   - **Strong Aggregation (Composition)**: Document exclusively owns its DocumentElements
+   - **Smart Pointers**: 
+     - `unique_ptr` used for DocumentElements to express exclusive ownership
+     - Elements are automatically destroyed when Document is destroyed
+     - No shared ownership of elements allowed
+     - Prevents memory leaks and dangling pointers
+   - **Lifecycle Management**:
+     - DocumentElements cannot exist without Document
+     - Elements are created and destroyed with Document
+     - Clear ownership semantics with `unique_ptr`
+
 ## Building the Project
 
 ### Prerequisites
@@ -107,6 +119,7 @@ The program will:
 - File I/O operations
 - Clean separation of concerns
 - Open for extension, closed for modification
+- Safe memory management with smart pointers
 
 ## Class Structure
 
@@ -114,6 +127,8 @@ The program will:
 - Manages document elements
 - Provides global access point
 - Handles element addition/removal
+- Exclusive owner of DocumentElements
+- Uses unique_ptr for memory management
 
 ### DocumentElement
 - Abstract base class for document elements

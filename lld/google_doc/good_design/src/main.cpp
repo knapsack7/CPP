@@ -9,15 +9,15 @@ int main() {
     Document* doc = Document::getInstance();
     
     // Create and add text elements
-    doc->addElement(std::make_shared<TextElement>("Welcome to Document Editor!"));
-    doc->addElement(std::make_shared<TextElement>("This is a sample document."));
+    doc->addElement(std::make_unique<TextElement>("Welcome to Document Editor!"));
+    doc->addElement(std::make_unique<TextElement>("This is a sample document."));
     
     // Create and add image elements
-    doc->addElement(std::make_shared<ImageElement>("sample.jpg"));
-    doc->addElement(std::make_shared<ImageElement>("logo.png"));
+    doc->addElement(std::make_unique<ImageElement>("sample.jpg"));
+    doc->addElement(std::make_unique<ImageElement>("logo.png"));
     
     // Add more text
-    doc->addElement(std::make_shared<TextElement>("End of document."));
+    doc->addElement(std::make_unique<TextElement>("End of document."));
     
     // Render the document
     DocumentRenderer renderer;
