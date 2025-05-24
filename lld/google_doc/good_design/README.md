@@ -26,6 +26,7 @@ good_design/
 1. **Singleton Pattern**
    - Document class ensures only one instance exists
    - Provides global access to document state
+   - Other classes (DocumentRenderer, DocumentStorage) use the singleton instance through getInstance()
 
 2. **Single Responsibility Principle**
    - Document: Manages document elements
@@ -36,6 +37,23 @@ good_design/
 3. **Factory Pattern**
    - DocumentElement hierarchy for different types of elements
    - TextElement and ImageElement implementations
+
+4. **Strategy Pattern**
+   - Used in DocumentRenderer for rendering different element types
+   - Allows adding new rendering strategies without modifying existing code
+   - Implements Open/Closed Principle for rendering functionality
+
+5. **Open/Closed Principle**
+   - DocumentElement hierarchy is open for extension (new element types)
+   - Rendering system is open for extension (new rendering strategies)
+   - New features can be added without modifying existing code
+   - Example: Adding new element types or rendering strategies doesn't require changing existing classes
+
+6. **Class Relationships**
+   - **Dependency**: DocumentRenderer and DocumentStorage depend on Document singleton
+   - **Association**: Classes use Document's services without owning it
+   - **Client-Service**: DocumentRenderer and DocumentStorage act as clients to the Document singleton service
+   - Note: This is not an aggregation relationship as there's no ownership or containment
 
 ## Building the Project
 
@@ -85,9 +103,10 @@ The program will:
 
 - Document management with singleton pattern
 - Support for multiple element types (text, images)
-- Document rendering
+- Document rendering with extensible strategy pattern
 - File I/O operations
 - Clean separation of concerns
+- Open for extension, closed for modification
 
 ## Class Structure
 
@@ -100,14 +119,19 @@ The program will:
 - Abstract base class for document elements
 - Defines common interface
 - Implemented by TextElement and ImageElement
+- Open for extension with new element types
 
 ### DocumentRenderer
 - Handles document rendering
+- Uses Strategy Pattern for rendering different elements
 - Converts elements to displayable format
+- Uses Document singleton through dependency relationship
+- Open for extension with new rendering strategies
 
 ### DocumentStorage
 - Manages file operations
 - Handles saving and loading documents
+- Uses Document singleton through dependency relationship
 
 ## Contributing
 
@@ -119,4 +143,4 @@ The program will:
 
 ## License
 
-This project is licensed under the MKV License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details. 

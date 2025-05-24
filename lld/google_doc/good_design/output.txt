@@ -1,5 +1,0 @@
-Welcome to Document Editor!
-This is a sample document.
-[Image: sample.jpg]
-[Image: logo.png]
-End of document.
