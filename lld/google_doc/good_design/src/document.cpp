@@ -12,7 +12,7 @@ Document* Document::getInstance() {
 }
 
 // Document management methods
-void Document::addElement(std::unique_ptr<DocumentElement> element) {
+void Document::addElement(std::unique_ptr<IDocumentElement> element) {
     elements.push_back(std::move(element));
 }
 
@@ -22,7 +22,7 @@ void Document::removeElement(size_t index) {
     }
 }
 
-const std::vector<std::unique_ptr<DocumentElement>>& Document::getElements() const {
+const std::vector<std::unique_ptr<IDocumentElement>>& Document::getElements() const {
     return elements;
 }
 

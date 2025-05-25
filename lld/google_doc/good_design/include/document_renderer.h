@@ -1,38 +1,38 @@
 #ifndef DOCUMENT_RENDERER_H
 #define DOCUMENT_RENDERER_H
 
-#include <string>
-#include <memory>
-#include <map>
-#include "document.h"
 #include "document_element.h"
+#include <string>
 
-// Interface for rendering strategy
-class IRenderStrategy {
+// Abstract base class for rendering strategies
+class IRenderer {
 public:
-    virtual ~IRenderStrategy() = default;
-    virtual std::string render(const DocumentElement& element) = 0;
+    virtual ~IRenderer() = default;
+    virtual std::string render(const IDocumentElement& element) = 0;
 };
 
-// Concrete strategies
-class TextRenderStrategy : public IRenderStrategy {
+// Concrete renderer for text elements
+class TextRenderer : public IRenderer {
 public:
-    std::string render(const DocumentElement& element) override;
+    std::string render(const IDocumentElement& element) override;
 };
 
-class ImageRenderStrategy : public IRenderStrategy {
+// Concrete renderer for image elements
+class ImageRenderer : public IRenderer {
 public:
-    std::string render(const DocumentElement& element) override;
+    std::string render(const IDocumentElement& element) override;
 };
 
+// Document renderer class that uses the strategy pattern
 class DocumentRenderer {
 private:
-    std::map<std::string, std::unique_ptr<IRenderStrategy>> strategies_;
+    IRenderer* renderer;
 
 public:
-    DocumentRenderer();
-    void registerStrategy(const std::string& type, std::unique_ptr<IRenderStrategy> strategy);
-    std::string renderDocument();
+    DocumentRenderer(IRenderer* renderer) : renderer(renderer) {}
+    std::string render(const IDocumentElement& element) {
+        return renderer->render(element);
+    }
 };
 
 #endif // DOCUMENT_RENDERER_H 

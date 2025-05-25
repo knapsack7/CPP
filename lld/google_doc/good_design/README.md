@@ -49,13 +49,44 @@ good_design/
    - New features can be added without modifying existing code
    - Example: Adding new element types or rendering strategies doesn't require changing existing classes
 
-6. **Class Relationships**
+6. **Liskov Substitution Principle**
+   - DocumentElement hierarchy properly implements LSP
+   - Base class (DocumentElement) defines a consistent interface
+   - Derived classes (TextElement, ImageElement) maintain behavioral compatibility
+   - Any DocumentElement can be substituted with its derived classes
+   - Common interface includes:
+     - getContent()
+     - getType()
+     - setContent()
+   - Derived classes implement the interface without violating the base class contract
+   - No runtime type checking needed
+   - Enables polymorphic behavior and extensibility
+
+7. **Interface Segregation Principle**
+   - **Segregated Interfaces**:
+     - `IDocumentElement`: Base interface with only essential `getType()` method
+     - `IEditable`: For elements that can be edited (text and tables)
+     - `IRenderable`: For elements that can be rendered
+     - `IStylable`: For elements that can be styled (text and tables)
+   - **Flexible Implementation**:
+     - `TextElement`: Implements all interfaces (IEditable, IRenderable, IStylable)
+     - `ImageElement`: Implements only necessary interfaces (IRenderable)
+     - `TableElement`: Implements multiple interfaces (IEditable, IRenderable, IStylable)
+   - **Benefits**:
+     - Clients only depend on interfaces they use
+     - No forced implementation of unnecessary methods
+     - Clear separation of concerns
+     - Easy to add new element types with specific capabilities
+     - Better maintainability and extensibility
+     - Clear interface identification with 'I' prefix convention
+
+8. **Class Relationships**
    - **Dependency**: DocumentRenderer and DocumentStorage depend on Document singleton
    - **Association**: Classes use Document's services without owning it
    - **Client-Service**: DocumentRenderer and DocumentStorage act as clients to the Document singleton service
    - Note: This is not an aggregation relationship as there's no ownership or containment
 
-7. **Ownership and Memory Management**
+9. **Ownership and Memory Management**
    - **Strong Aggregation (Composition)**: Document exclusively owns its DocumentElements
    - **Smart Pointers**: 
      - `unique_ptr` used for DocumentElements to express exclusive ownership

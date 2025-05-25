@@ -1,33 +1,22 @@
 #include "../include/document_renderer.h"
+#include <sstream>
 
-std::string TextRenderStrategy::render(const DocumentElement& element) {
-    return element.getContent() + "\n";
-}
-
-std::string ImageRenderStrategy::render(const DocumentElement& element) {
-    return "[Image: " + element.getContent() + "]\n";
-}
-
-DocumentRenderer::DocumentRenderer() {
-    // Register default strategies
-    strategies_["text"] = std::make_unique<TextRenderStrategy>();
-    strategies_["image"] = std::make_unique<ImageRenderStrategy>();
-}
-
-void DocumentRenderer::registerStrategy(const std::string& type, std::unique_ptr<IRenderStrategy> strategy) {
-    strategies_[type] = std::move(strategy);
-}
-
-std::string DocumentRenderer::renderDocument() {
-    std::string result;
-    Document* doc = Document::getInstance();
-    
-    for (const auto& element : doc->getElements()) {
-        auto it = strategies_.find(element->getType());
-        if (it != strategies_.end()) {
-            result += it->second->render(*element);
-        }
+std::string TextRenderer::render(const IDocumentElement& element) {
+    // Cast to TextElement to access its specific methods
+    const TextElement* textElement = dynamic_cast<const TextElement*>(&element);
+    if (textElement) {
+        return textElement->getContent();
     }
-    
-    return result;
+    return "[Invalid Text Element]";
+}
+
+std::string ImageRenderer::render(const IDocumentElement& element) {
+    // Cast to ImageElement to access its specific methods
+    const ImageElement* imageElement = dynamic_cast<const ImageElement*>(&element);
+    if (imageElement) {
+        std::stringstream ss;
+        ss << "[Image: " << imageElement->getWidth() << "x" << imageElement->getHeight() << "]";
+        return ss.str();
+    }
+    return "[Invalid Image Element]";
 } 
