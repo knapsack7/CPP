@@ -80,13 +80,35 @@ good_design/
      - Better maintainability and extensibility
      - Clear interface identification with 'I' prefix convention
 
-8. **Class Relationships**
+8. **Dependency Inversion Principle**
+   - **Interface-Based Design**:
+     - Clear interfaces (`IDocumentElement`, `IEditable`, `IRenderable`, `IStylable`) represent abstractions
+     - Concrete implementations depend on interfaces rather than concrete implementations
+   - **High-Level Modules Independence**:
+     - `Document` class depends on `IDocumentElement` interface
+     - Uses `std::unique_ptr<IDocumentElement>` for flexibility
+   - **Interface Segregation**:
+     - Functionality broken into focused interfaces
+     - Classes implement only needed interfaces
+   - **Abstraction Through Interfaces**:
+     - `Document` operates on abstract `IDocumentElement` interface
+     - Enables easy extension with new element types
+   - **Polymorphic Behavior**:
+     - Virtual functions and polymorphism through interfaces
+     - Runtime flexibility and extension
+   - **Benefits**:
+     - More maintainable code
+     - Easier testing
+     - Flexible for future extensions
+     - Reduced coupling between components
+
+9. **Class Relationships**
    - **Dependency**: DocumentRenderer and DocumentStorage depend on Document singleton
    - **Association**: Classes use Document's services without owning it
    - **Client-Service**: DocumentRenderer and DocumentStorage act as clients to the Document singleton service
    - Note: This is not an aggregation relationship as there's no ownership or containment
 
-9. **Ownership and Memory Management**
+10. **Ownership and Memory Management**
    - **Strong Aggregation (Composition)**: Document exclusively owns its DocumentElements
    - **Smart Pointers**: 
      - `unique_ptr` used for DocumentElements to express exclusive ownership
@@ -189,4 +211,4 @@ The program will:
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MKV License - see the LICENSE file for details. 
