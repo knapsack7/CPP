@@ -167,12 +167,31 @@ The program will:
 ## Features
 
 - Document management with singleton pattern
-- Support for multiple element types (text, images)
+- Support for multiple element types (text, images, tables)
 - Document rendering with extensible strategy pattern
-- File I/O operations
+- File I/O operations (JSON-based save/load)
 - Clean separation of concerns
 - Open for extension, closed for modification
 - Safe memory management with smart pointers
+
+## File Storage (Save/Load)
+
+- Documents are saved and loaded in a human-readable JSON format.
+- All document elements (text, image, table) and their properties are serialized.
+- The JSON library used is [nlohmann/json](https://github.com/nlohmann/json), included as a header-only file in `third_party/json.hpp`.
+- Example usage:
+  ```cpp
+  DocumentStorage storage;
+  storage.saveToFile("filename.json");
+  storage.loadFromFile("filename.json");
+  ```
+- No extra installation is needed for the JSON library.
+
+## Dependencies
+
+- C++20 compiler
+- CMake >= 3.10
+- [nlohmann/json](https://github.com/nlohmann/json) (included as `third_party/json.hpp`)
 
 ## Class Structure
 

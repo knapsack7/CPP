@@ -79,6 +79,7 @@ public:
     void setDimensions(int width, int height);
     int getWidth() const { return width; }
     int getHeight() const { return height; }
+    std::string getImagePath() const { return imagePath; }
 };
 
 // Table element - implements multiple interfaces
@@ -108,6 +109,8 @@ public:
     void setCell(int row, int col, const std::string& content);
     std::string getCell(int row, int col) const;
     void resize(int rows, int cols);
+    const std::vector<std::vector<std::string>>& getData() const { return data; }
+    void setData(const std::vector<std::vector<std::string>>& d) { data = d; }
 };
 
 #endif // DOCUMENT_ELEMENT_H 
