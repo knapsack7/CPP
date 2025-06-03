@@ -1,0 +1,3 @@
+/Users/manoj/Documents/CPP/lld/food_delivery_app/build/CMakeFiles/OnlineFoodOrderingSystem.dir
+/Users/manoj/Documents/CPP/lld/food_delivery_app/build/CMakeFiles/edit_cache.dir
+/Users/manoj/Documents/CPP/lld/food_delivery_app/build/CMakeFiles/rebuild_cache.dir
