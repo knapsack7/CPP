@@ -1,5 +1,6 @@
 #include "integer.h"
 #include <iostream>
+#include <memory>
 
 class IntPtr{
     Integer *h_ptr;
@@ -15,11 +16,19 @@ public:
     Integer& operator*() const { return *h_ptr; }
 };
 
+void process(std::unique_ptr<Integer> p){
+    std::cout << "Process function called" << std::endl;
+    std::cout << p->GetValue() << std::endl;
+}
+
+void createInteger(){
+    std::unique_ptr<Integer> p(new Integer);
+    p->SetValue(10);
+    (*p).SetValue(20);
+    process(std::move(p));
+}
+
 int main(){
-    IntPtr ptr = new Integer;
-    ptr->SetValue(10);
-    (*ptr).SetValue(30);
-    std::cout << ptr->GetValue() << std::endl;
-    std::cout << "About to return from main" << std::endl;
+    createInteger();
     return 0;
 }
