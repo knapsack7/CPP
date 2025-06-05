@@ -22,11 +22,37 @@ Integer::Integer(Integer &&obj) noexcept{
     obj.m_pInt = nullptr;
 }
 
+Integer& Integer::operator=(const Integer &obj){
+    std::cout << "operator=(const Integer&)" << std::endl;
+    if (this == &obj){
+        return *this;
+    }
+    delete m_pInt; // ensure no memory leak
+    m_pInt = new int(*obj.m_pInt);
+    return *this;
+}
+
+Integer& Integer::operator=(Integer &&obj) noexcept{
+    std::cout << "operator=(const Integer&&)" << std::endl;
+    if (this == &obj){
+        return *this;
+    }
+    delete m_pInt; // ensure no memory leak
+    m_pInt = new int(*obj.m_pInt);
+    obj.m_pInt = nullptr;
+    return *this;
+}
+
+
 int Integer::GetValue() const{
     return *m_pInt;
 }
 
 void Integer::SetValue(int value){
+    // to avoid seg fault, we need to check if m_pInt is not nullptr
+    // if move is performed on object, m_pInt will be nullptr
+    if (m_pInt == nullptr)
+        m_pInt = new int{};
     *m_pInt = value;
 }
 

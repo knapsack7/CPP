@@ -16,6 +16,13 @@ public:
     
     //Move constructor - transfers ownership of resources from another Integer
     Integer(Integer &&obj) noexcept;
+
+    // copy assignment operator
+    Integer& operator=(const Integer &);
+
+    // move assignment operator
+    Integer& operator=(Integer &&) noexcept;
+
     
     //Getter - returns the value of the Integer
     int GetValue() const;
