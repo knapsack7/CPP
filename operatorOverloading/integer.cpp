@@ -80,6 +80,11 @@ bool Integer::operator==(const Integer &obj) const{
     return *m_pInt == *(obj.m_pInt);
 }
 
+void Integer::operator()(){
+    std::cout << "operator() called" << std::endl;
+    std::cout << "Value: " << *m_pInt << std::endl;
+}
+
 Integer::~Integer(){
     std::cout << "~Integer()" << std::endl;
     delete m_pInt;

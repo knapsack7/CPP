@@ -39,5 +39,9 @@ public:
 
     bool operator==(const Integer &obj) const;
 
+
+    friend std::istream& operator>>(std::istream& is, Integer &obj);
+    void operator()();
+
     ~Integer();
 };
