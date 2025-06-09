@@ -22,6 +22,12 @@
  * but are never accessible in the derived class, regardless of
  * inheritance type. This is to maintain proper object construction
  * and destruction chain.
+ * Note: There are 3 member functions that are not inherited:
+ * 1. constructor
+ * 2. destructor
+ * 3. assignment operator
+ * So if ur child class has not its own data members, then u can use using keyword
+ * to invoke base class constructor and destructor
  */
 
 class Animal{
