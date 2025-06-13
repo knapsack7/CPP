@@ -89,3 +89,8 @@ Integer::~Integer(){
     std::cout << "~Integer()" << std::endl;
     delete m_pInt;
 }
+
+std::ostream& operator<<(std::ostream& os, const Integer &obj){
+    os << "Integer: " << *obj.m_pInt;
+    return os;
+}
