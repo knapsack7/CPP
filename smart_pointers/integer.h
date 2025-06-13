@@ -43,5 +43,7 @@ public:
     friend std::istream& operator>>(std::istream& is, Integer &obj);
     void operator()();
 
+    friend std::ostream& operator<<(std::ostream& os, const Integer &obj);
+
     ~Integer();
 };
