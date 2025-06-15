@@ -15,7 +15,10 @@ Integer::Integer(const Integer &obj){
     std::cout << "Integer(const Integer&)" << std::endl;
     m_pInt = new int(*obj.m_pInt);
 }
-
+// move should always be noexcept as it is used to transfer ownership
+// and it is used to avoid copying of object. STL Containers such as
+// vector, map, set, etc. use move constructor to avoid copying of object
+// only if move constructor is noexcept.
 Integer::Integer(Integer &&obj) noexcept{
     std::cout << "Integer(Integer&&)" << std::endl;
     m_pInt = obj.m_pInt;
