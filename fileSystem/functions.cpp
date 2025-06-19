@@ -72,8 +72,115 @@ void usingPath(){
     std::cout << "File is block device: " << fs::is_block_file(selectedPath) << std::endl;
 }
 
+void traversingDirectory(std::string_view path){
+
+    fs::path  currPath{path};
+
+    std::vector<fs::directory_entry> entries;
+    for(const auto & dir_entry : fs::directory_iterator(currPath)){
+        entries.push_back(dir_entry); // Removed as per request
+    }
+    std::partition(entries.begin(), entries.end(), [](const fs::directory_entry & de){
+        return de.is_directory();
+    });
+
+    for(const auto & dir_entry : entries){
+        std::cout <<  dir_entry.path() << std::endl;
+
+        switch(const auto & path = dir_entry.path(); dir_entry.status().type()){
+
+            case fs::file_type::regular:     
+                std::cout << "Regular file: " << path.string() << "\t" << dir_entry.file_size() << std::endl;
+                break;
+            case fs::file_type::directory:
+                std::cout << "Directory: " << path.string() << std::endl;
+        }
+
+    }
+
+}
+
+
+void directory_operations(std::string_view path){
+    fs::path currPath{path};
+    if (fs::exists(path) == false){  // check if path exists
+        std::cout << "Directory does not exist" << std::endl;
+        return;
+    }
+    currPath /= "newDir";
+    if (!fs::create_directory(currPath)){
+        std::cout << "Failed to create directory" << std::endl;
+        //return;
+    } else {
+        std::cout << "Directory created" << std::endl;
+    }
+
+    // if (!fs::remove(currPath)){
+    //     std::cout << "Failed to remove directory" << std::endl;
+    //     return;
+    // } else {
+    //     std::cout << "Directory removed" << std::endl;
+    // }
+
+    try{
+        std::cout << fs::current_path() << std::endl;
+        std::cout << "Changing path ";
+        fs::current_path(currPath);
+        std::error_code ec;
+        if(ec){
+            std::cout << "Error: " << ec.message() << std::endl;
+            return ;
+        }
+        std::cout << fs::current_path() << std::endl;
+    }catch(const fs::filesystem_error & e){
+        std::cout << "Error: " << e.what() << std::endl;
+    }
+
+    std::cout << "Creating file in current directory" << std::endl;
+    fs::path filePath{fs::current_path() / "newFile.txt"};
+    std::ofstream outFile{filePath};
+    outFile << "Hello World!" << std::endl;
+    outFile.close();
+}
+void demo_perms(std::filesystem::perms p)
+{
+    using std::filesystem::perms;
+    auto show = [=](char op, perms perm)
+    {
+        std::cout << (perms::none == (perm & p) ? '-' : op);
+    };
+    show('r', perms::owner_read);
+    show('w', perms::owner_write);
+    show('x', perms::owner_exec);
+    show('r', perms::group_read);
+    show('w', perms::group_write);
+    show('x', perms::group_exec);
+    show('r', perms::others_read);
+    show('w', perms::others_write);
+    show('x', perms::others_exec);
+    std::cout << '\n';
+}
+
+void permissions(std::string_view file){
+    fs::path file_to_modify{file};
+    if (!fs::exists(file_to_modify)){
+        std::cout << "File does not exist" << std::endl;
+        return;
+    }
+    auto perm = fs::status(file_to_modify).permissions();
+    demo_perms(perm);
+    std::cout << "Changing permissions" << std::endl;
+    fs::permissions(file_to_modify, fs::perms::owner_all, fs::perm_options::add);
+    demo_perms(perm);
+}
+
+
 int main(){
     //usingPath();
+    //traversingDirectory(R"(/Users/manoj/Documents/CPP/)");
+    //directory_operations(R"(/Users/manoj/Documents/CPP/fileSystem/)");
+    //traversingDirectory(R"(/Users/manoj/Documents/CPP/fileSystem/)");
+    permissions(R"(/Users/manoj/Documents/CPP/fileSystem/file.txt)");
     return 0;
 }
 
