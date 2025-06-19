@@ -22,6 +22,20 @@
  * Character sequence is not guaranteed to be null-termninated
  *      consequently, may not work with c String functions
  * NO ALLOCATOR SUPPORT
+ * 
+ * INTERNAL STRUCTURE:
+ * std::string_view typically has two default data members:
+ * 1. data_ (or similar): A const char* pointer to the character sequence
+ * 2. size_ (or length_): A size_t value representing the length of the sequence
+ * 
+ * These members allow string_view to:
+ * - Reference existing character data without copying
+ * - Know the bounds of the sequence for safe access
+ * - Provide O(1) operations like size(), empty(), front(), back()
+ * - Support substring operations efficiently
+ * 
+ * The actual member names may vary by implementation, but the concept
+ * remains the same - a lightweight view consisting of a pointer and size.
  */
 
 int main(){
