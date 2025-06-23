@@ -42,6 +42,5 @@ int main(){
     threadCompute.join();
     std::cout << "\nResult: " << ft2.get() << std::endl; // main will block here
 
-    std::cout << "main thread ended" << std::endl;
     return 0;
 }
