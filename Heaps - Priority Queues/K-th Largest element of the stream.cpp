@@ -12,7 +12,7 @@ int main(){
         if(Q.size() < k){
             Q.push(n);
             if(Q.size() == k){
-                cout  << Q.top() 3<< endl;
+                cout  << Q.top()<< endl;
             }
             else{
                 cout << "NULL" << endl;

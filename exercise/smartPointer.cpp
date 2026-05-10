@@ -45,22 +45,25 @@ public:
     // a different resource - possibly releasing the old one, and
     // now sharing ownership of the new one.
     SmartPtr<T>& operator=(SmartPtr<T>& other){
-        // other    -> gives us the SmartPtr object itself
+         // other    -> gives us the SmartPtr object itself
         // &other   -> gives us the address of the SmartPtr object (SmartPtr*)
         // this     -> gives us the address of current object (SmartPtr*)
         // *this    -> gives us the current object itself
         if(this != &other){
-            if (ref_cnt_obj->getRefCount() == 0){
+            // Decrement current reference count
+            --(*ref_cnt_obj);
+            
+            // If this was the last owner, delete the resource
+            if(ref_cnt_obj->getRefCount() == 0){
                 delete ptr;
                 delete ref_cnt_obj;
-                std::cout<<"Old object deleted" << std::endl;
+                std::cout << "Old object deleted" << std::endl;
             }
-            (*ref_cnt_obj)--;
+            
+            // Transfer ownership
             ptr = other.ptr;
             ref_cnt_obj = other.ref_cnt_obj;
-            ++(*ref_cnt_obj); // increment the reference count using the operator++
         }
-        std::cout << "SmartPtr assigned" << std::endl;
         return *this;
     }
     ~SmartPtr(){
